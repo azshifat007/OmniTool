@@ -96,6 +96,10 @@ const tools = [
   { href: '/tools/countdown', title: 'Countdown Timer', desc: 'Set a timer with presets, pause, and audible alert', icon: '⏳', cat: 'Fun' },
   { href: '/tools/color-blindness', title: 'Color Blindness Simulator', desc: 'Simulate protanopia, deuteranopia, tritanopia & more', icon: '◉', cat: 'Design' },
   { href: '/tools/scratchpad', title: 'Scratchpad', desc: 'Quick notes that auto-save to your browser', icon: '✍', cat: 'Text' },
+  { href: '/tools/html-minify', title: 'HTML Minifier', desc: 'Strip comments, whitespace & reduce HTML file size', icon: 'Hm', cat: 'Code' },
+  { href: '/tools/stopwatch', title: 'Stopwatch', desc: 'Count up with lap times and millisecond precision', icon: '⌚', cat: 'Fun' },
+  { href: '/tools/contrast', title: 'Color Contrast Checker', desc: 'Check WCAG AA/AAA compliance between two colors', icon: '◐', cat: 'Design' },
+  { href: '/tools/url-parser', title: 'URL Parser', desc: 'Parse URLs into components and query parameters', icon: '⇉', cat: 'Code' },
 ];
 
 const stagger = {
