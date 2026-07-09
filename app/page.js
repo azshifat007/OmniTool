@@ -100,6 +100,10 @@ const tools = [
   { href: '/tools/stopwatch', title: 'Stopwatch', desc: 'Count up with lap times and millisecond precision', icon: '⌚', cat: 'Fun' },
   { href: '/tools/contrast', title: 'Color Contrast Checker', desc: 'Check WCAG AA/AAA compliance between two colors', icon: '◐', cat: 'Design' },
   { href: '/tools/url-parser', title: 'URL Parser', desc: 'Parse URLs into components and query parameters', icon: '⇉', cat: 'Code' },
+  { href: '/tools/sci-calc', title: 'Scientific Calculator', desc: 'Advanced math with trig, log, factorial & more', icon: '√', cat: 'Math' },
+  { href: '/tools/image-crop', title: 'Image Cropper', desc: 'Select and crop a region from any image', icon: '⊟', cat: 'Media' },
+  { href: '/tools/device-info', title: 'Device Info', desc: 'View browser, screen, network & system details', icon: 'ℹ', cat: 'System' },
+  { href: '/tools/calendar', title: 'Calendar', desc: 'Monthly calendar view with navigation', icon: '◰', cat: 'Date' },
 ];
 
 const stagger = {
