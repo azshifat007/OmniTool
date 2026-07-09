@@ -116,6 +116,11 @@ const tools = [
   { href: '/tools/credit-card', title: 'Credit Card Validator', desc: 'Validate card numbers with Luhn algorithm and detect card type', icon: '⌘', cat: 'Security' },
   { href: '/tools/moon-phase', title: 'Moon Phase', desc: 'Find moon phase, illumination and age for any date', icon: '☾', cat: 'Date' },
   { href: '/tools/resolution', title: 'Resolution Calculator', desc: 'Calculate aspect ratio, megapixels, PPI and pixel pitch', icon: '□', cat: 'Media' },
+  { href: '/tools/http-request', title: 'HTTP Request Builder', desc: 'Send HTTP requests with custom method, headers and body', icon: '⇶', cat: 'Network' },
+  { href: '/tools/html2md', title: 'HTML to Markdown', desc: 'Convert HTML snippets to clean Markdown', icon: 'H↓', cat: 'Code' },
+  { href: '/tools/ascii-art', title: 'ASCII Art Generator', desc: 'Transform text into ASCII art with multiple styles', icon: '▓', cat: 'Fun' },
+  { href: '/tools/gzip', title: 'GZip Compressor', desc: 'Compress and decompress text with gzip', icon: '⊡', cat: 'Code' },
+  { href: '/tools/box-model', title: 'CSS Box Model', desc: 'Visualize and generate CSS margin, border and padding', icon: '▢', cat: 'Design' },
 ];
 
 const stagger = {
