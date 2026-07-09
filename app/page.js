@@ -136,6 +136,11 @@ const tools = [
   { href: '/tools/palette-from-image', title: 'Palette from Image', desc: 'Extract dominant colors from any image', icon: '◐', cat: 'Media' },
   { href: '/tools/image-compare', title: 'Image Comparer', desc: 'Compare two images with an interactive slider', icon: '⇔', cat: 'Media' },
   { href: '/tools/dotenv', title: 'Dotenv Parser', desc: 'Parse .env files and convert to JSON or YAML', icon: '.env', cat: 'Code' },
+  { href: '/tools/reaction-time', title: 'Reaction Time Test', desc: 'Measure your reaction speed with click timing', icon: '⏱', cat: 'Fun' },
+  { href: '/tools/typing-speed', title: 'Typing Speed Test', desc: 'Test your WPM typing speed and accuracy', icon: '⌨', cat: 'Fun' },
+  { href: '/tools/piano', title: 'Piano', desc: 'Play piano with keyboard or click using Web Audio', icon: '♫', cat: 'Media' },
+  { href: '/tools/roman', title: 'Roman Numeral Converter', desc: 'Convert between numbers and Roman numerals', icon: 'R', cat: 'Math' },
+  { href: '/tools/outline', title: 'CSS Outline Generator', desc: 'Visual CSS outline property editor with preview', icon: '◎', cat: 'Design' },
 ];
 
 const stagger = {
