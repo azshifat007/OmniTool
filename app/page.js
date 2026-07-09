@@ -92,6 +92,10 @@ const tools = [
   { href: '/tools/fake-data', title: 'Fake Data Generator', desc: 'Generate mock names, emails, phones & more', icon: 'D', cat: 'Code' },
   { href: '/tools/tts', title: 'Text to Speech', desc: 'Read text aloud with voice, rate & pitch controls', icon: '♫', cat: 'Media' },
   { href: '/tools/drawing-board', title: 'Drawing Board', desc: 'Freehand drawing canvas with color & brush control', icon: '✏', cat: 'Design' },
+  { href: '/tools/image-resizer', title: 'Image Resizer', desc: 'Resize images by dimensions with aspect ratio lock', icon: '⧉', cat: 'Media' },
+  { href: '/tools/countdown', title: 'Countdown Timer', desc: 'Set a timer with presets, pause, and audible alert', icon: '⏳', cat: 'Fun' },
+  { href: '/tools/color-blindness', title: 'Color Blindness Simulator', desc: 'Simulate protanopia, deuteranopia, tritanopia & more', icon: '◉', cat: 'Design' },
+  { href: '/tools/scratchpad', title: 'Scratchpad', desc: 'Quick notes that auto-save to your browser', icon: '✍', cat: 'Text' },
 ];
 
 const stagger = {
