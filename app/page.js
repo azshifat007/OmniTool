@@ -126,6 +126,11 @@ const tools = [
   { href: '/tools/isbn', title: 'ISBN Validator', desc: 'Validate ISBN-10 and ISBN-13 with check digit & format conversion', icon: 'ISBN', cat: 'Code' },
   { href: '/tools/text-shadow', title: 'Text Shadow Generator', desc: 'Create multi-layer CSS text shadows with live preview', icon: 'T', cat: 'Design' },
   { href: '/tools/metronome', title: 'Metronome', desc: 'Audio metronome with BPM control and time signatures', icon: '♩', cat: 'Media' },
+  { href: '/tools/audio-recorder', title: 'Audio Recorder', desc: 'Record audio from your microphone and download as WebM', icon: '♪', cat: 'Media' },
+  { href: '/tools/keyboard', title: 'Keyboard Tester', desc: 'Test key presses with a visual keyboard and event log', icon: '⌨', cat: 'System' },
+  { href: '/tools/flexbox', title: 'Flexbox Generator', desc: 'Visual CSS flexbox layout builder with live preview', icon: '≡', cat: 'Design' },
+  { href: '/tools/rsa', title: 'RSA Key Generator', desc: 'Generate RSA public/private key pairs in PEM format', icon: '⚷', cat: 'Security' },
+  { href: '/tools/ciphers', title: 'Ciphers', desc: 'Encode and decode text with Caesar, Atbash, ROT13 & Vigenere', icon: '⚔', cat: 'Security' },
 ];
 
 const stagger = {
