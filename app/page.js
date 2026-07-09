@@ -108,6 +108,10 @@ const tools = [
   { href: '/tools/text-encoder', title: 'Text Encoder', desc: 'Encode text as binary, hex, octal & decimal char codes', icon: '01', cat: 'Code' },
   { href: '/tools/color-harmonies', title: 'Color Harmonies', desc: 'Generate complementary, triadic, tetradic & analogous colors', icon: '◐', cat: 'Design' },
   { href: '/tools/battery', title: 'Battery Info', desc: 'View battery level, charging status and estimated time', icon: '⚡', cat: 'System' },
+  { href: '/tools/image-filter', title: 'Image Filters', desc: 'Apply grayscale, sepia & invert filters with adjustable intensity', icon: '◑', cat: 'Media' },
+  { href: '/tools/stt', title: 'Speech to Text', desc: 'Transcribe speech in real-time using your microphone', icon: '♩', cat: 'Media' },
+  { href: '/tools/pomodoro', title: 'Pomodoro Timer', desc: 'Focus timer with work/break intervals and session tracking', icon: '⏲', cat: 'Fun' },
+  { href: '/tools/color-names', title: 'CSS Color Names', desc: 'Browse and search all 148 named CSS colors with preview', icon: '◐', cat: 'Design' },
 ];
 
 const stagger = {
