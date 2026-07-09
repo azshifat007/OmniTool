@@ -104,6 +104,10 @@ const tools = [
   { href: '/tools/image-crop', title: 'Image Cropper', desc: 'Select and crop a region from any image', icon: '⊟', cat: 'Media' },
   { href: '/tools/device-info', title: 'Device Info', desc: 'View browser, screen, network & system details', icon: 'ℹ', cat: 'System' },
   { href: '/tools/calendar', title: 'Calendar', desc: 'Monthly calendar view with navigation', icon: '◰', cat: 'Date' },
+  { href: '/tools/json-to-ts', title: 'JSON to TypeScript', desc: 'Generate TypeScript interfaces from JSON objects', icon: 'TS', cat: 'Code' },
+  { href: '/tools/text-encoder', title: 'Text Encoder', desc: 'Encode text as binary, hex, octal & decimal char codes', icon: '01', cat: 'Code' },
+  { href: '/tools/color-harmonies', title: 'Color Harmonies', desc: 'Generate complementary, triadic, tetradic & analogous colors', icon: '◐', cat: 'Design' },
+  { href: '/tools/battery', title: 'Battery Info', desc: 'View battery level, charging status and estimated time', icon: '⚡', cat: 'System' },
 ];
 
 const stagger = {
