@@ -141,6 +141,11 @@ const tools = [
   { href: '/tools/piano', title: 'Piano', desc: 'Play piano with keyboard or click using Web Audio', icon: '♫', cat: 'Media' },
   { href: '/tools/roman', title: 'Roman Numeral Converter', desc: 'Convert between numbers and Roman numerals', icon: 'R', cat: 'Math' },
   { href: '/tools/outline', title: 'CSS Outline Generator', desc: 'Visual CSS outline property editor with preview', icon: '◎', cat: 'Design' },
+  { href: '/tools/click-speed', title: 'Click Speed Test', desc: 'Test how fast you can click in a timed session', icon: '◎', cat: 'Fun' },
+  { href: '/tools/bmi', title: 'BMI Calculator', desc: 'Calculate BMI, BMR and weight category', icon: '◉', cat: 'Math' },
+  { href: '/tools/color-temp', title: 'Color Temperature', desc: 'Convert between Kelvin color temperature and RGB', icon: '◐', cat: 'Design' },
+  { href: '/tools/investment', title: 'Investment Calculator', desc: 'Project investment growth with compound interest', icon: '%', cat: 'Math' },
+  { href: '/tools/dedup', title: 'Duplicate Line Remover', desc: 'Remove duplicate, empty or unwanted lines from text', icon: '≡', cat: 'Text' },
 ];
 
 const stagger = {
