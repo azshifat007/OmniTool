@@ -146,6 +146,11 @@ const tools = [
   { href: '/tools/color-temp', title: 'Color Temperature', desc: 'Convert between Kelvin color temperature and RGB', icon: '◐', cat: 'Design' },
   { href: '/tools/investment', title: 'Investment Calculator', desc: 'Project investment growth with compound interest', icon: '%', cat: 'Math' },
   { href: '/tools/dedup', title: 'Duplicate Line Remover', desc: 'Remove duplicate, empty or unwanted lines from text', icon: '≡', cat: 'Text' },
+  { href: '/tools/graphql', title: 'GraphQL Formatter', desc: 'Format and indent GraphQL queries and mutations', icon: '⚡', cat: 'Code' },
+  { href: '/tools/noise', title: 'Noise Generator', desc: 'Generate white, pink, and brown noise for focus or sleep', icon: '♪', cat: 'Media' },
+  { href: '/tools/breathing', title: 'Breathing Exercise', desc: 'Guided breathing patterns for relaxation and focus', icon: '○', cat: 'Fun' },
+  { href: '/tools/scrollbar', title: 'Scrollbar CSS Generator', desc: 'Create custom scrollbar styles with live preview', icon: '▤', cat: 'Design' },
+  { href: '/tools/cursors', title: 'CSS Cursor Reference', desc: 'Browse and test all CSS cursor values', icon: '✙', cat: 'Design' },
 ];
 
 const stagger = {
