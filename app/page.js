@@ -131,6 +131,11 @@ const tools = [
   { href: '/tools/flexbox', title: 'Flexbox Generator', desc: 'Visual CSS flexbox layout builder with live preview', icon: '≡', cat: 'Design' },
   { href: '/tools/rsa', title: 'RSA Key Generator', desc: 'Generate RSA public/private key pairs in PEM format', icon: '⚷', cat: 'Security' },
   { href: '/tools/ciphers', title: 'Ciphers', desc: 'Encode and decode text with Caesar, Atbash, ROT13 & Vigenere', icon: '⚔', cat: 'Security' },
+  { href: '/tools/grid', title: 'CSS Grid Generator', desc: 'Visual CSS grid layout builder with live preview', icon: '⊞', cat: 'Design' },
+  { href: '/tools/transition', title: 'Transition Generator', desc: 'Create and preview CSS transitions interactively', icon: '▶', cat: 'Design' },
+  { href: '/tools/palette-from-image', title: 'Palette from Image', desc: 'Extract dominant colors from any image', icon: '◐', cat: 'Media' },
+  { href: '/tools/image-compare', title: 'Image Comparer', desc: 'Compare two images with an interactive slider', icon: '⇔', cat: 'Media' },
+  { href: '/tools/dotenv', title: 'Dotenv Parser', desc: 'Parse .env files and convert to JSON or YAML', icon: '.env', cat: 'Code' },
 ];
 
 const stagger = {
