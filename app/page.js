@@ -121,6 +121,11 @@ const tools = [
   { href: '/tools/ascii-art', title: 'ASCII Art Generator', desc: 'Transform text into ASCII art with multiple styles', icon: '▓', cat: 'Fun' },
   { href: '/tools/gzip', title: 'GZip Compressor', desc: 'Compress and decompress text with gzip', icon: '⊡', cat: 'Code' },
   { href: '/tools/box-model', title: 'CSS Box Model', desc: 'Visualize and generate CSS margin, border and padding', icon: '▢', cat: 'Design' },
+  { href: '/tools/storage', title: 'Storage Explorer', desc: 'Browse, search, add and delete browser localStorage and sessionStorage', icon: '◫', cat: 'System' },
+  { href: '/tools/svg-to-jsx', title: 'SVG to JSX', desc: 'Convert SVG markup to React JSX components', icon: '◈', cat: 'Code' },
+  { href: '/tools/isbn', title: 'ISBN Validator', desc: 'Validate ISBN-10 and ISBN-13 with check digit & format conversion', icon: 'ISBN', cat: 'Code' },
+  { href: '/tools/text-shadow', title: 'Text Shadow Generator', desc: 'Create multi-layer CSS text shadows with live preview', icon: 'T', cat: 'Design' },
+  { href: '/tools/metronome', title: 'Metronome', desc: 'Audio metronome with BPM control and time signatures', icon: '♩', cat: 'Media' },
 ];
 
 const stagger = {
