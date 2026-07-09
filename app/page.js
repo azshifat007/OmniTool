@@ -88,6 +88,10 @@ const tools = [
   { href: '/tools/weeknum', title: 'Week Number', desc: 'Calculate ISO week number and day-of-year stats', icon: 'Wk', cat: 'Date' },
   { href: '/tools/decide', title: 'Decision Maker', desc: 'Coin flip, dice roll, yes/no, and custom picker', icon: '?', cat: 'Fun' },
   { href: '/tools/dice', title: 'Dice Roller', desc: 'Roll multiple dice with realistic animations', icon: '⚄', cat: 'Fun' },
+  { href: '/tools/emoji-search', title: 'Emoji Search', desc: 'Search and copy emojis by name or keyword', icon: '☺', cat: 'Fun' },
+  { href: '/tools/fake-data', title: 'Fake Data Generator', desc: 'Generate mock names, emails, phones & more', icon: 'D', cat: 'Code' },
+  { href: '/tools/tts', title: 'Text to Speech', desc: 'Read text aloud with voice, rate & pitch controls', icon: '♫', cat: 'Media' },
+  { href: '/tools/drawing-board', title: 'Drawing Board', desc: 'Freehand drawing canvas with color & brush control', icon: '✏', cat: 'Design' },
 ];
 
 const stagger = {
