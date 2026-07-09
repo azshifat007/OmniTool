@@ -112,6 +112,10 @@ const tools = [
   { href: '/tools/stt', title: 'Speech to Text', desc: 'Transcribe speech in real-time using your microphone', icon: '♩', cat: 'Media' },
   { href: '/tools/pomodoro', title: 'Pomodoro Timer', desc: 'Focus timer with work/break intervals and session tracking', icon: '⏲', cat: 'Fun' },
   { href: '/tools/color-names', title: 'CSS Color Names', desc: 'Browse and search all 148 named CSS colors with preview', icon: '◐', cat: 'Design' },
+  { href: '/tools/css-units', title: 'CSS Units Converter', desc: 'Convert between px, em, rem, vw, vh, pt, cm, mm & more with live preview', icon: '⌗', cat: 'Code' },
+  { href: '/tools/credit-card', title: 'Credit Card Validator', desc: 'Validate card numbers with Luhn algorithm and detect card type', icon: '⌘', cat: 'Security' },
+  { href: '/tools/moon-phase', title: 'Moon Phase', desc: 'Find moon phase, illumination and age for any date', icon: '☾', cat: 'Date' },
+  { href: '/tools/resolution', title: 'Resolution Calculator', desc: 'Calculate aspect ratio, megapixels, PPI and pixel pitch', icon: '□', cat: 'Media' },
 ];
 
 const stagger = {
