@@ -26,8 +26,19 @@ export default function Navbar() {
         setFocused(false);
       }
     };
+    const handleKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setFocused(true);
+      }
+    };
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, []);
 
   const results = query.trim()
@@ -67,11 +78,11 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div ref={wrapperRef} className="relative flex-1 max-w-md">
+            <div ref={wrapperRef} className="relative flex-1 max-w-md">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary text-sm pointer-events-none">
-                ~
-              </span>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               <input
                 ref={inputRef}
                 type="text"
@@ -80,8 +91,9 @@ export default function Navbar() {
                 onFocus={() => setFocused(true)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search tools..."
-                className="w-full bg-bg rounded-xl pl-8 pr-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors placeholder:text-text-tertiary"
+                className="w-full bg-bg rounded-xl pl-9 pr-10 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors placeholder:text-text-tertiary"
               />
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-bg border border-border text-text-tertiary pointer-events-none">⌘K</kbd>
             </div>
 
             <AnimatePresence>
