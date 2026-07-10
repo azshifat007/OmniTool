@@ -10,6 +10,7 @@
   "dependencies": {
     "framer-motion": "^12.42.2",
     "js-yaml": "^5.2.1",
+    "jsbarcode": "^3.12.3",
     "next": "16.2.10",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.1.200",
