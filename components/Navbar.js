@@ -68,8 +68,8 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1 }}
           className={`rounded-2xl px-5 py-3 flex items-center justify-between gap-3 transition-all duration-300 ${
             scrolled
-              ? 'bg-surface/85 nav-blur shadow-[0_1px_8px_rgba(0,0,0,0.06)]'
-              : 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+              ? 'bg-surface/85 nav-blur shadow-[var(--color-shadow-nav)]'
+              : 'bg-surface shadow-[var(--color-shadow-nav-sm)]'
           }`}
         >
           <div className="flex items-center gap-2 shrink-0">

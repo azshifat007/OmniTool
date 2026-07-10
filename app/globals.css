@@ -14,6 +14,8 @@
   --color-border: #E8E6E1;
   --color-border-light: #F0EFEB;
   --color-badge-bg: #F0EFEB;
+  --color-shadow-nav: 0 1px 8px rgba(0,0,0,0.06);
+  --color-shadow-nav-sm: 0 1px 3px rgba(0,0,0,0.04);
 
   --color-cat-text: #FF6B6B;
   --color-cat-pdf: #E94560;
@@ -50,6 +52,8 @@
   --color-border: #26262C;
   --color-border-light: #1E1E22;
   --color-badge-bg: #222228;
+  --color-shadow-nav: 0 1px 8px rgba(0,0,0,0.45);
+  --color-shadow-nav-sm: 0 1px 3px rgba(0,0,0,0.35);
 
   --color-cat-text: #FF8A8A;
   --color-cat-pdf: #FF6B8A;

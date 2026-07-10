@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import TiltCard from '@/components/TiltCard';
+import { Hero, BgGradient, TextStagger, AnimatedContainer } from '@/components/hero';
 import { motion, AnimatePresence } from 'framer-motion';
 import tools from '@/lib/tools';
 
@@ -28,30 +29,35 @@ export default function Home() {
 
   return (
     <div>
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.175, 0.885, 0.32, 1] }}
-        className="mb-12 text-center relative"
-      >
-        <div className="absolute inset-0 flex justify-center -top-20 pointer-events-none overflow-hidden">
-          <div className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/5 via-accent/5 to-cat-text/5 blur-3xl" />
-        </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5 relative">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />
-          {tools.length} powerful tools
-        </div>
-        <h1 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold text-text mb-4 tracking-tight leading-[1.1] relative">
-          Everything you need,
-          <br />
-          <span className="gradient-text">
-            nothing you don't
-          </span>
-        </h1>
-        <p className="text-text-secondary text-sm sm:text-lg max-w-lg mx-auto leading-relaxed relative">
-          A playful toolkit for developers, creators, and tinkerers — all in one place.
-        </p>
-      </motion.div>
+      <Hero className="mb-12 !min-h-0 !pb-0">
+        <BgGradient
+          gradientSize="lg"
+          gradientPosition={{ x: "50%", y: "-20%" }}
+          gradientColors={[
+            { color: "rgb(108, 92, 231)", start: "0%" },
+            { color: "rgb(255, 138, 101)", start: "40%" },
+            { color: "rgb(15, 15, 20)", start: "80%" },
+          ]}
+          className="opacity-30 dark:opacity-50"
+        />
+        <AnimatedContainer transformDirection="bottom">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />
+            {tools.length} powerful tools
+          </div>
+        </AnimatedContainer>
+        <TextStagger
+          text="Everything you need, nothing you don't"
+          stagger={0.04}
+          direction="bottom"
+          className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold text-text mb-4 tracking-tight leading-[1.1]"
+        />
+        <AnimatedContainer transformDirection="bottom" transition={{ delay: 0.6, duration: 0.5 }}>
+          <p className="text-text-secondary text-sm sm:text-lg max-w-lg mx-auto leading-relaxed">
+            A playful toolkit for developers, creators, and tinkerers — all in one place.
+          </p>
+        </AnimatedContainer>
+      </Hero>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
