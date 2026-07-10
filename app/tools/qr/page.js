@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import { useHistory } from '@/components/HistoryProvider';
+import QRCode from 'qrcode';
 
 export default function QrPage() {
   const { addEntry } = useHistory();
@@ -11,21 +12,20 @@ export default function QrPage() {
   const [error, setError] = useState('');
   const canvasRef = useRef(null);
 
-  const generate = useCallback(async () => {
+  const generate = async () => {
     setError('');
     if (!text.trim()) { setError('Enter text or URL to generate.'); return; }
     try {
-      const QRCode = (await import('qrcode')).default;
       await QRCode.toCanvas(canvasRef.current, text, {
         width: 300,
         margin: 2,
-        color: { dark: '#1A1A2E', light: 'transparent' },
+        color: { dark: '#1A1A2E', light: '#FFFFFF' },
       });
       addEntry('QR Code Generator');
     } catch (e) {
       setError(e.message);
     }
-  }, [text, addEntry]);
+  };
 
   const download = () => {
     const canvas = canvasRef.current;
