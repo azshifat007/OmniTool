@@ -110,7 +110,7 @@ export default function GlowingShadow({ children }) {
           position: relative;
           background: var(--card-color);
           border-radius: calc(var(--card-radius) * 0.9);
-          padding: 1.5rem;
+          padding: clamp(0.75rem, 4vw, 1.5rem);
           overflow: hidden;
         }
 

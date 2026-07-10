@@ -73,14 +73,14 @@ export default function Home() {
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />
           {tools.length} powerful tools
         </div>
-        <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-text mb-4 tracking-tight leading-[1.1] relative">
+        <h1 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold text-text mb-4 tracking-tight leading-[1.1] relative">
           Everything you need,
           <br />
           <span className="gradient-text">
             nothing you don't
           </span>
         </h1>
-        <p className="text-text-secondary text-base sm:text-lg max-w-lg mx-auto leading-relaxed relative">
+        <p className="text-text-secondary text-sm sm:text-lg max-w-lg mx-auto leading-relaxed relative">
           A playful toolkit for developers, creators, and tinkerers — all in one place.
         </p>
       </motion.div>
@@ -91,7 +91,7 @@ export default function Home() {
         transition={{ delay: 0.2, duration: 0.4 }}
         className="mb-8 space-y-4"
       >
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex gap-2 justify-center overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
           {CATS.map(cat => (
             <button
               key={cat}
