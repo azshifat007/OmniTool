@@ -7,38 +7,6 @@ import tools from '@/lib/tools';
 
 const CATS = ['All', ...new Set(tools.map(t => t.cat))];
 
-const catStyles = {
-  Text: 'bg-cat-text/10 text-cat-text border-cat-text/20',
-  PDF: 'bg-cat-pdf/10 text-cat-pdf border-cat-pdf/20',
-  Document: 'bg-cat-document/10 text-cat-document border-cat-document/20',
-  Code: 'bg-cat-code/10 text-cat-code border-cat-code/20',
-  Security: 'bg-cat-security/10 text-cat-security border-cat-security/20',
-  Design: 'bg-cat-design/10 text-cat-design border-cat-design/20',
-  Date: 'bg-cat-date/10 text-cat-date border-cat-date/20',
-  Media: 'bg-cat-media/10 text-cat-media border-cat-media/20',
-  Math: 'bg-cat-math/10 text-cat-math border-cat-math/20',
-  Network: 'bg-cat-network/10 text-cat-network border-cat-network/20',
-  DevOps: 'bg-cat-devops/10 text-cat-devops border-cat-devops/20',
-  Fun: 'bg-cat-fun/10 text-cat-fun border-cat-fun/20',
-  System: 'bg-cat-system/10 text-cat-system border-cat-system/20',
-};
-
-const iconColors = {
-  Text: 'text-cat-text', PDF: 'text-cat-pdf', Document: 'text-cat-document',
-  Code: 'text-cat-code', Security: 'text-cat-security', Design: 'text-cat-design',
-  Date: 'text-cat-date', Media: 'text-cat-media', Math: 'text-cat-math',
-  Network: 'text-cat-network', DevOps: 'text-cat-devops', Fun: 'text-cat-fun',
-  System: 'text-cat-system',
-};
-
-const catColorMap = {
-  Text: 'cat-text/', PDF: 'cat-pdf/', Document: 'cat-document/',
-  Code: 'cat-code/', Security: 'cat-security/', Design: 'cat-design/',
-  Date: 'cat-date/', Media: 'cat-media/', Math: 'cat-math/',
-  Network: 'cat-network/', DevOps: 'cat-devops/', Fun: 'cat-fun/',
-  System: 'cat-system/',
-};
-
 export default function Home() {
   const [activeCat, setActiveCat] = useState('All');
   const [search, setSearch] = useState('');
@@ -138,17 +106,8 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
             >
-              <TiltCard href={tool.href}>
-                <div className="flex items-start justify-between mb-4">
-                  <span className={`text-3xl ${iconColors[tool.cat] || 'text-text-tertiary'}`}>
-                    {tool.icon}
-                  </span>
-                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${catStyles[tool.cat] || 'bg-badge-bg text-text-tertiary border-border'}`}>
-                    {tool.cat}
-                  </span>
-                </div>
-                <h3 className="font-heading text-base font-semibold text-text mb-1.5">{tool.title}</h3>
-                <p className="text-sm text-text-secondary leading-relaxed">{tool.desc}</p>
+              <TiltCard href={tool.href} cat={tool.cat} icon={tool.icon} title={tool.title}>
+                {tool.desc}
               </TiltCard>
             </motion.div>
           ))}
