@@ -3,12 +3,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 import tools from '@/lib/tools';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { dark, toggle } = useTheme();
+  const pathname = usePathname();
+  const isToolPage = pathname !== '/';
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const inputRef = useRef(null);
@@ -69,14 +72,28 @@ export default function Navbar() {
               : 'bg-white dark:bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'
           }`}
         >
-          <Link href="/" className="flex items-center gap-3 no-underline group shrink-0">
-            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-sm group-hover:shadow-md transition-shadow">
-              O
-            </span>
-            <span className="font-heading text-lg font-semibold text-text hidden sm:inline">
-              OmniTool
-            </span>
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            {isToolPage && (
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-text-tertiary transition-all cursor-pointer"
+                aria-label="Go back"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+              </button>
+            )}
+            <Link href="/" className="flex items-center gap-3 no-underline group">
+              <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-sm group-hover:shadow-md transition-shadow">
+                O
+              </span>
+              <span className="font-heading text-lg font-semibold text-text hidden sm:inline">
+                OmniTool
+              </span>
+            </Link>
+          </div>
 
             <div ref={wrapperRef} className="relative flex-1 max-w-md">
             <div className="relative">
