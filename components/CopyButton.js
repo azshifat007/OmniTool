@@ -12,7 +12,6 @@ export default function CopyButton({ text, className = '' }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // fallback
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
@@ -27,7 +26,7 @@ export default function CopyButton({ text, className = '' }) {
   return (
     <button
       onClick={handleCopy}
-      className={`relative px-3 py-1.5 text-xs font-medium rounded-lg glass glass-hover transition-all ${className}`}
+      className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-bg border border-border text-text-secondary hover:text-text hover:border-primary hover:bg-primary/5 transition-all cursor-pointer ${className}`}
     >
       <AnimatePresence mode="wait">
         {copied ? (
@@ -38,7 +37,7 @@ export default function CopyButton({ text, className = '' }) {
             exit={{ opacity: 0, scale: 0.8 }}
             className="flex items-center gap-1"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
             Copied
           </motion.span>
         ) : (
@@ -49,7 +48,7 @@ export default function CopyButton({ text, className = '' }) {
             exit={{ opacity: 0, scale: 0.8 }}
             className="flex items-center gap-1"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
             Copy
           </motion.span>
         )}
