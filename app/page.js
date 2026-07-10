@@ -128,7 +128,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5"
         >
           {filtered.map(tool => (
             <motion.div

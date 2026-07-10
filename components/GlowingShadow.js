@@ -170,7 +170,6 @@ export default function GlowingShadow({ children }) {
         }
 
         .glow-container:hover .glow-content {
-          mix-blend-mode: darken;
         }
 
         .glow-container:hover .glow-content:before {
