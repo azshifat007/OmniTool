@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import TiltCard from '@/components/TiltCard';
-import { Hero, BgGradient, TextStagger, AnimatedContainer } from '@/components/hero';
+import { Hero, TextStagger, AnimatedContainer } from '@/components/hero';
 import { motion, AnimatePresence } from 'framer-motion';
 import tools from '@/lib/tools';
 
@@ -29,18 +29,7 @@ export default function Home() {
 
   return (
     <div>
-      <Hero className="mb-12 !min-h-0 !pb-0">
-        <BgGradient
-          gradientSize="lg"
-          gradientPosition={{ x: "50%", y: "-20%" }}
-          gradientColors={[
-            { color: "rgb(124, 58, 237)", start: "0%" },
-            { color: "rgb(249, 115, 22)", start: "40%" },
-            { color: "rgb(245, 158, 11)", start: "70%" },
-            { color: "rgb(245, 243, 255)", start: "100%" },
-          ]}
-          className="opacity-40"
-        />
+      <Hero className="mb-12 !min-h-0 !pb-0 bg-transparent">
         <AnimatedContainer transformDirection="bottom">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />
