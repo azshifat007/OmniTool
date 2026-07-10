@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cva } from "class-variance-authority"
 import { motion } from "motion/react"
+import { useTheme } from "./ThemeProvider"
 
 import { cn } from "@/lib/utils"
 
@@ -101,8 +102,10 @@ export function BgGradient({
   gradientPosition = GRADIENT_POSITIONS["top"],
   gradientColors = GRADIENT_COLORS["purple"],
   className,
+  darkClassName,
   ...props
 }) {
+  const { dark } = useTheme()
   const gradientString = Array.isArray(gradientColors)
     ? gradientColors.map(({ color, start }) => `${color} ${start}`).join(", ")
     : GRADIENT_COLORS[gradientColors]
@@ -128,7 +131,8 @@ export function BgGradient({
     <div
       className={cn(
         "pointer-events-none absolute inset-0 size-full select-none",
-        className
+        className,
+        dark && darkClassName
       )}
       style={{
         background: dominantColor,
@@ -206,9 +210,9 @@ export const AnimatedContainer = React.forwardRef(
         whileInView={"visible"}
         viewport={{ once: true, ...props.viewport }}
         transition={{
-          duration: props.transition?.delay ?? 0.4,
-          ease: props.transition?.delay ?? "easeIn",
-          delay: props.transition?.delay ?? 0.4,
+          duration: 0.5,
+          ease: "easeOut",
+          delay: 0.4,
           ...props.transition,
         }}
         {...props}

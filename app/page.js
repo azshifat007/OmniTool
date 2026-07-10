@@ -38,7 +38,8 @@ export default function Home() {
             { color: "rgb(255, 138, 101)", start: "40%" },
             { color: "rgb(15, 15, 20)", start: "80%" },
           ]}
-          className="opacity-30 dark:opacity-50"
+          className="opacity-30"
+          darkClassName="opacity-50"
         />
         <AnimatedContainer transformDirection="bottom">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
