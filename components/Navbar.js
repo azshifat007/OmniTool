@@ -76,7 +76,7 @@ export default function Navbar() {
             {isToolPage && (
               <button
                 onClick={() => window.history.back()}
-                className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-text-tertiary transition-all cursor-pointer"
+                className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all cursor-pointer"
                 aria-label="Go back"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -86,10 +86,10 @@ export default function Navbar() {
               </button>
             )}
             <Link href="/" className="flex items-center gap-3 no-underline group">
-              <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-sm group-hover:shadow-md transition-shadow">
+              <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all">
                 O
               </span>
-              <span className="font-heading text-lg font-semibold text-text hidden sm:inline">
+              <span className="font-heading text-lg font-semibold text-text hidden sm:inline group-hover:text-primary transition-colors">
                 OmniTool
               </span>
             </Link>
@@ -108,7 +108,7 @@ export default function Navbar() {
                 onFocus={() => setFocused(true)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search tools..."
-                className="w-full bg-bg rounded-xl pl-9 pr-10 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors placeholder:text-text-tertiary"
+                className="w-full bg-bg rounded-xl pl-9 pr-10 py-2 text-sm text-text border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-text-tertiary"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-bg border border-border text-text-tertiary pointer-events-none">⌘K</kbd>
             </div>
@@ -120,7 +120,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute top-full left-0 right-0 mt-1.5 bg-surface border border-border rounded-xl shadow-xl overflow-hidden max-h-72 overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-1.5 bg-surface border border-border rounded-xl shadow-xl overflow-hidden max-h-72 overflow-y-auto z-50"
                 >
                   {results.length === 0 ? (
                     <div className="px-4 py-3 text-sm text-text-tertiary">No tools found</div>
@@ -136,10 +136,10 @@ export default function Navbar() {
                           {tool.icon}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm font-medium text-text truncate">{tool.title}</div>
+                          <div className="text-sm font-medium text-text truncate group-hover:text-primary transition-colors">{tool.title}</div>
                           <div className="text-xs text-text-tertiary truncate">{tool.desc}</div>
                         </div>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-bg border border-border text-text-tertiary shrink-0">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
                           {tool.cat}
                         </span>
                       </Link>
@@ -153,7 +153,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={toggle}
-              className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-text-tertiary transition-all cursor-pointer"
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all cursor-pointer"
               aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {dark ? (
@@ -169,7 +169,7 @@ export default function Navbar() {
 
             <Link
               href="/history"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-bg border border-border text-sm font-medium text-text-secondary hover:text-text hover:border-text-tertiary transition-all no-underline"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-bg border border-border text-sm font-medium text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all no-underline"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

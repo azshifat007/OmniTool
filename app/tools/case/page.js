@@ -36,8 +36,8 @@ export default function CasePage() {
             onClick={() => setActive(c.id)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all cursor-pointer ${
               active === c.id
-                ? 'bg-primary text-white border-primary'
-                : 'bg-surface text-text-secondary border-border hover:border-primary/40 hover:text-text'
+                ? 'bg-primary text-white border-primary shadow-md shadow-primary/25 scale-105'
+                : 'bg-surface text-text-secondary border-border hover:border-primary/40 hover:text-text hover:shadow-md hover:scale-105'
             }`}
           >
             {c.label}
@@ -46,23 +46,23 @@ export default function CasePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="bg-surface rounded-2xl border border-border p-4">
+        <div className="bg-surface rounded-2xl border border-border p-4 shadow-sm">
           <label className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2 block">Input</label>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type or paste text here..."
-            className="w-full h-48 bg-transparent text-text resize-none outline-none text-sm leading-relaxed placeholder:text-text-tertiary"
+            className="w-full h-48 bg-transparent text-text resize-none outline-none text-sm leading-relaxed placeholder:text-text-tertiary focus:ring-2 focus:ring-primary/20 rounded-lg p-2 transition-all"
           />
           <div className="text-xs text-text-tertiary mt-2">{input.length} characters</div>
         </div>
 
-        <div className="bg-surface rounded-2xl border border-border p-4">
+        <div className="bg-surface rounded-2xl border border-border p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <label className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">Output</label>
             {output && <CopyButton text={output} />}
           </div>
-          <div className="w-full h-48 overflow-auto text-text text-sm leading-relaxed break-words whitespace-pre-wrap">
+          <div className="w-full h-48 overflow-auto text-text text-sm leading-relaxed break-words whitespace-pre-wrap rounded-lg p-2">
             {output || <span className="text-text-tertiary">Converted text will appear here</span>}
           </div>
         </div>

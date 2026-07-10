@@ -51,18 +51,18 @@ export default function TiltCard({ href, cat, icon, title, children }) {
     <Link href={href} className="no-underline block group h-full cursor-pointer">
       <div
         onMouseMove={handleMouse}
-        className="relative bg-surface rounded-3xl border border-border h-full overflow-hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-300 group-hover:shadow-xl group-hover:shadow-primary/10 group-hover:border-primary/30"
+        className="relative bg-surface rounded-3xl border border-border h-full overflow-hidden flex flex-col items-center justify-center p-6 text-center transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/15 group-hover:border-primary/40 group-hover:-translate-y-1"
       >
         <CardPattern mouseX={mx} mouseY={my} str={str} />
         <div className="relative z-10 flex flex-col items-center gap-3 w-full">
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-full flex items-center justify-center shrink-0">
-            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 blur rounded-full" />
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
+            <div className="absolute inset-0 bg-white/90 dark:bg-black/90 blur-xl rounded-full opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
             <span className="relative z-10 text-3xl sm:text-4xl leading-none">{icon}</span>
           </div>
-          <h3 className="font-heading text-base sm:text-lg font-semibold text-text mt-1">
+          <h3 className="font-heading text-base sm:text-lg font-semibold text-text mt-1 group-hover:text-primary transition-colors duration-300">
             {title}
           </h3>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-300">
             {cat}
           </span>
           <p className="text-sm text-text-secondary leading-relaxed line-clamp-2 max-w-[90%]">

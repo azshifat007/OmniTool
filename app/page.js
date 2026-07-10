@@ -34,12 +34,12 @@ export default function Home() {
           gradientSize="lg"
           gradientPosition={{ x: "50%", y: "-20%" }}
           gradientColors={[
-            { color: "rgb(108, 92, 231)", start: "0%" },
-            { color: "rgb(255, 138, 101)", start: "40%" },
-            { color: "rgb(15, 15, 20)", start: "80%" },
+            { color: "rgb(124, 58, 237)", start: "0%" },
+            { color: "rgb(249, 115, 22)", start: "40%" },
+            { color: "rgb(245, 158, 11)", start: "70%" },
+            { color: "rgb(245, 243, 255)", start: "100%" },
           ]}
-          className="opacity-30"
-          darkClassName="opacity-50"
+          className="opacity-40"
         />
         <AnimatedContainer transformDirection="bottom">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
@@ -73,12 +73,12 @@ export default function Home() {
               onClick={() => setActiveCat(cat)}
               className={`px-3.5 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${
                 activeCat === cat
-                  ? 'bg-primary text-white border-primary shadow-sm'
-                  : 'bg-surface text-text-secondary border-border hover:text-text hover:border-text-tertiary'
+                  ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-105'
+                  : 'bg-surface text-text-secondary border-border hover:text-text hover:border-primary/40 hover:shadow-md hover:scale-105'
               }`}
             >
               {cat}
-              <span className={`ml-1.5 text-[10px] ${activeCat === cat ? 'text-white/70' : 'text-text-tertiary'}`}>
+              <span className={`ml-1.5 text-[10px] ${activeCat === cat ? 'text-white/80' : 'text-text-tertiary'}`}>
                 {counts[cat]}
               </span>
             </button>
@@ -91,7 +91,7 @@ export default function Home() {
           <input
             type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Filter tools..."
-            className="w-full bg-surface rounded-xl pl-9 pr-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors placeholder:text-text-tertiary"
+            className="w-full bg-surface rounded-xl pl-9 pr-3 py-2.5 text-sm text-text border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-text-tertiary shadow-sm"
           />
         </div>
       </motion.div>
