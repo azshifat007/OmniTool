@@ -32,6 +32,8 @@ export default function CpuInfoPage() {
     { label: 'CPU Cores', value: info.cores, icon: '⚙' },
     { label: 'Device Memory', value: info.memory === 'Not available' ? info.memory : `${info.memory} GB`, icon: '💾' },
     { label: 'Platform', value: info.platform, icon: '🖥' },
+    { label: 'Browser', value: browser, icon: '🌐' },
+    { label: 'Engine', value: engine, icon: '🔧' },
     { label: 'Language', value: info.language, icon: '🌐' },
     { label: 'Languages', value: info.languages.join(', '), icon: '🌍' },
     { label: 'Max Touch Points', value: info.maxTouchPoints, icon: '👆' },
@@ -39,6 +41,18 @@ export default function CpuInfoPage() {
     { label: 'Do Not Track', value: info.doNotTrack, icon: '🚫' },
     { label: 'WebDriver', value: info.webdriver ? 'Yes' : 'No', icon: '🤖' },
   ];
+
+  const engine = /Edg\//.test(info.userAgent) ? 'EdgeHTML / Blink'
+    : /Chrome\//.test(info.userAgent) ? 'Blink'
+    : /Firefox\//.test(info.userAgent) ? 'Gecko'
+    : /Safari\//.test(info.userAgent) ? 'WebKit' : 'Unknown';
+  const browser = /Edg\//.test(info.userAgent) ? 'Edge'
+    : /OPR\//.test(info.userAgent) || /Opera/.test(info.userAgent) ? 'Opera'
+    : /Chrome\//.test(info.userAgent) ? 'Chrome'
+    : /Firefox\//.test(info.userAgent) ? 'Firefox'
+    : /Safari\//.test(info.userAgent) ? 'Safari' : 'Unknown';
+
+  const copyUA = () => navigator.clipboard.writeText(info.userAgent);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -65,7 +79,13 @@ export default function CpuInfoPage() {
 
       <GlassCard className="mt-5">
         <div className="p-4">
-          <div className="text-xs text-text-tertiary mb-2">User Agent</div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs text-text-tertiary">User Agent</div>
+            <button onClick={copyUA}
+              className="text-xs font-medium rounded-lg bg-surface border border-border px-2 py-1 text-text-secondary hover:text-text transition-colors cursor-pointer">
+              Copy UA
+            </button>
+          </div>
           <div className="text-xs font-mono text-text-secondary break-all bg-surface rounded-lg p-3 border border-border">
             {info.userAgent}
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -17,13 +17,18 @@ const presets = [
 const fieldLabels = ['Minute', 'Hour', 'Day of Month', 'Month', 'Day of Week'];
 
 function describeField(value, index) {
-  if (value === '*') return 'Every';
+  if (value === '*') return 'every';
   if (value.includes(',')) return value.split(',').map(v => describeField(v, index)).join(', ');
   if (value.startsWith('*/')) {
     const n = parseInt(value.slice(2), 10);
-    return `Every ${n} ${fieldLabels[index].toLowerCase()}(s)`;
+    const unit = fieldLabels[index].toLowerCase();
+    return `every ${n} ${unit}${n > 1 ? 's' : ''}`;
   }
-  return `At ${value}`;
+  return `at ${value}`;
+}
+
+function describeExpression(parts) {
+  return 'Runs ' + parts.slice(0, 5).map((v, i) => describeField(v, i)).join(', ') + '.';
 }
 
 function nextTimes(expr) {
@@ -76,10 +81,11 @@ export default function CronPage() {
   const [fields, setFields] = useState(null);
   const [next, setNext] = useState([]);
   const [error, setError] = useState('');
+  const [touched, setTouched] = useState(false);
 
-  const handleParse = useCallback(() => {
+  const parse = useCallback((expr) => {
     setError('');
-    const parts = expression.trim().split(/\s+/);
+    const parts = expr.trim().split(/\s+/);
     if (parts.length < 5 || parts.length > 6) {
       setError('Enter a valid 5 or 6 field cron expression.');
       setFields(null);
@@ -92,16 +98,31 @@ export default function CronPage() {
       desc: describeField(v, i),
     }));
     setFields(desc);
-    setNext(nextTimes(expression));
+    setNext(nextTimes(expr));
+  }, []);
+
+  const handleParse = useCallback(() => {
+    parse(expression);
     addEntry('Cron Parser');
-  }, [expression, addEntry]);
+  }, [expression, parse, addEntry]);
+
+  const handleChange = useCallback((e) => {
+    const expr = e.target.value;
+    setExpression(expr);
+    setTouched(true);
+    parse(expr);
+  }, [parse]);
 
   const applyPreset = useCallback((expr) => {
     setExpression(expr);
-    setFields(null);
-    setNext([]);
+    setTouched(true);
     setError('');
-  }, []);
+    parse(expr);
+  }, [parse]);
+
+  useEffect(() => {
+    parse(expression);
+  }, [parse, expression]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -114,7 +135,7 @@ export default function CronPage() {
         <div className="p-4">
           <label className="text-xs text-text-tertiary mb-3 block">Cron Expression</label>
           <div className="flex gap-2">
-            <input value={expression} onChange={(e) => setExpression(e.target.value)} placeholder="* * * * *"
+            <input value={expression} onChange={handleChange} placeholder="* * * * *"
               onKeyDown={(e) => e.key === 'Enter' && handleParse()}
               className="flex-1 bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
             <button onClick={handleParse} className="px-4 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Parse</button>
@@ -134,6 +155,18 @@ export default function CronPage() {
 
       {fields && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <GlassCard>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-text-tertiary">Summary</span>
+                <CopyButton text={describeExpression(expression.trim().split(/\s+/))} />
+              </div>
+              <p className="text-sm text-text-secondary leading-relaxed capitalize">
+                {describeExpression(expression.trim().split(/\s+/))}
+              </p>
+            </div>
+          </GlassCard>
+
           <GlassCard>
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">

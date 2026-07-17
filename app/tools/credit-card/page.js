@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import { useHistory } from '@/components/HistoryProvider';
@@ -47,14 +47,46 @@ function formatCard(num) {
   return parts.join(' ').trim();
 }
 
+function generateCard(brand) {
+  const pattern = cardPatterns.find((c) => c.name === brand) || cardPatterns[0];
+  const length = pattern.lengths[0];
+  const prefix = pattern.prefix[0];
+  let digits = prefix;
+  while (digits.length < length - 1) {
+    digits += Math.floor(Math.random() * 10).toString();
+  }
+  let sum = 0;
+  for (let i = 0; i < digits.length; i++) {
+    let d = parseInt(digits[digits.length - 1 - i], 10);
+    if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; }
+    sum += d;
+  }
+  const check = (10 - (sum % 10)) % 10;
+  return digits + check.toString();
+}
+
 export default function CreditCardPage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('');
   const [focused, setFocused] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const digits = input.replace(/\D/g, '');
   const detected = detectCard(digits);
   const valid = digits.length > 0 ? luhnCheck(digits) : null;
+
+  const handleGenerate = useCallback((brand) => {
+    const num = generateCard(brand);
+    setInput(num);
+    addEntry('Credit Card Generator');
+  }, [addEntry]);
+
+  const handleCopy = useCallback(async () => {
+    if (!digits) return;
+    await navigator.clipboard.writeText(digits);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [digits]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -104,9 +136,15 @@ export default function CreditCardPage() {
             )}
 
             {valid && detected && !detected.partial && (
-              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                <div className="text-xs font-medium text-green-500 mb-1">Valid {detected.name} card</div>
-                <div className="text-[10px] text-text-secondary font-mono">{formatCard(digits)}</div>
+              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-medium text-green-500 mb-1">Valid {detected.name} card</div>
+                  <div className="text-[10px] text-text-secondary font-mono">{formatCard(digits)}</div>
+                </div>
+                <button onClick={handleCopy}
+                  className="text-[11px] font-medium rounded-lg bg-surface border border-border px-3 py-1.5 text-text-secondary hover:text-text transition-colors cursor-pointer">
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
               </div>
             )}
           </div>
@@ -132,7 +170,16 @@ export default function CreditCardPage() {
             </div>
 
             <div className="mt-4 space-y-2">
-              <span className="text-xs text-text-tertiary block">Test numbers</span>
+              <span className="text-xs text-text-tertiary block">Generate valid test number</span>
+              <div className="flex flex-wrap gap-2">
+                {['Visa', 'Mastercard', 'American Express', 'Discover'].map((brand) => (
+                  <button key={brand} onClick={() => handleGenerate(brand)}
+                    className="text-[11px] font-medium rounded-lg bg-surface border border-border px-2.5 py-1.5 text-text-secondary hover:text-text transition-colors cursor-pointer">
+                    {brand}
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-text-tertiary block mt-4">Static test numbers</span>
               {[
                 ['Visa', '4111111111111111'],
                 ['Mastercard', '5555555555554444'],
