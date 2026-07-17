@@ -12,6 +12,17 @@ export default function PdfToTxtPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const downloadTxt = useCallback(() => {
+    if (!text) return;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'extracted.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [text]);
+
   const handleFile = useCallback(async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -58,7 +69,13 @@ export default function PdfToTxtPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-text-tertiary">Extracted Text ({text.length} chars)</span>
-                <CopyButton text={text} className="text-xs" />
+                <div className="flex gap-2">
+                  <CopyButton text={text} className="text-xs" />
+                  <button onClick={downloadTxt}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-bg border border-border text-text-secondary hover:text-text hover:border-primary hover:bg-primary/5 transition-all cursor-pointer">
+                    Download
+                  </button>
+                </div>
               </div>
               <pre className="bg-surface rounded-xl p-4 text-sm text-text leading-relaxed border border-border/50 max-h-96 overflow-y-auto whitespace-pre-wrap">{text}</pre>
             </div>

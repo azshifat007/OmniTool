@@ -12,6 +12,22 @@ export default function PdfThumbnailPage() {
   const [loading, setLoading] = useState(false);
   const canvasRef = useRef(null);
 
+  const downloadOne = useCallback((t) => {
+    const a = document.createElement('a');
+    a.href = t.src;
+    a.download = `thumbnail-page-${t.page}.png`;
+    a.click();
+  }, []);
+
+  const downloadAll = useCallback(() => {
+    thumbnails.forEach((t) => {
+      const a = document.createElement('a');
+      a.href = t.src;
+      a.download = `thumbnail-page-${t.page}.png`;
+      a.click();
+    });
+  }, [thumbnails]);
+
   const handleFile = useCallback(async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -61,16 +77,26 @@ export default function PdfThumbnailPage() {
           </label>
           {error && <div className="text-cat-text text-xs bg-cat-text/10 rounded-lg px-3 py-2 border border-cat-text/20">{error}</div>}
           {thumbnails.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {thumbnails.map(t => (
-                <div key={t.page} className="bg-surface rounded-xl border border-border/50 overflow-hidden">
-                  <img src={t.src} alt={`Page ${t.page}`} className="w-full" />
-                  <div className="px-2 py-1.5 text-[10px] text-text-tertiary text-center border-t border-border/50">
-                    Page {t.page} · {t.width}×{t.height}
+            <>
+              <div className="flex justify-end mb-3">
+                <button onClick={downloadAll}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-bg border border-border text-text-secondary hover:text-text hover:border-primary hover:bg-primary/5 transition-all cursor-pointer">
+                  Download All
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {thumbnails.map(t => (
+                  <div key={t.page} className="bg-surface rounded-xl border border-border/50 overflow-hidden">
+                    <img src={t.src} alt={`Page ${t.page}`} className="w-full" />
+                    <div className="flex items-center justify-between px-2 py-1.5 text-[10px] text-text-tertiary border-t border-border/50">
+                      <span>Page {t.page} · {t.width}×{t.height}</span>
+                      <button onClick={() => downloadOne(t)}
+                        className="text-primary hover:text-primary-dark transition-colors cursor-pointer">Save</button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </GlassCard>

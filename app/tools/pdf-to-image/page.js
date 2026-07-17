@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import { useHistory } from '@/components/HistoryProvider';
@@ -10,7 +10,6 @@ export default function PdfToImagePage() {
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [scale, setScale] = useState(1.5);
-  const canvasRef = useRef(null);
 
   const handleFile = useCallback(async (e) => {
     const file = e.target.files[0];
@@ -20,7 +19,7 @@ export default function PdfToImagePage() {
     try {
       const buf = await file.arrayBuffer();
       const pdfjs = await import('pdfjs-dist');
-      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.mjs';
       const pdf = await pdfjs.getDocument({ data: buf }).promise;
       const imgs = [];
       for (let i = 1; i <= pdf.numPages; i++) {

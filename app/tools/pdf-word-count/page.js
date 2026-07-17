@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function PdfWordCountPage() {
@@ -69,6 +70,21 @@ export default function PdfWordCountPage() {
           {error && <div className="text-cat-text text-xs bg-cat-text/10 rounded-lg px-3 py-2 border border-cat-text/20">{error}</div>}
           {stats && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+              <div className="flex items-center justify-end">
+                <CopyButton
+                  text={[
+                    `Words: ${stats.words.toLocaleString()}`,
+                    `Pages: ${stats.pages}`,
+                    `Characters: ${stats.chars.toLocaleString()}`,
+                    `Characters (no spaces): ${stats.charsNoSpace.toLocaleString()}`,
+                    `Sentences: ${stats.sentences.toLocaleString()}`,
+                    `Lines: ${stats.lines.toLocaleString()}`,
+                    `Average Word Length: ${stats.avgWordLen} chars`,
+                    `File Size: ${stats.sizeKB} KB`,
+                  ].join('\n')}
+                  className="text-xs"
+                />
+              </div>
               <div className="text-center text-4xl font-bold font-heading text-text py-2">{stats.words.toLocaleString()} <span className="text-lg text-text-secondary font-normal">words</span></div>
               <div className="grid grid-cols-2 gap-2">
                 {[

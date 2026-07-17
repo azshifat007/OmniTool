@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function PdfMetaPage() {
@@ -22,7 +23,7 @@ export default function PdfMetaPage() {
     try {
       const buf = await file.arrayBuffer();
       const pdfjs = await import('pdfjs-dist');
-      pdfjs.GlobalWorkerOptions.workerSrc = '';
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.mjs';
       const doc = await pdfjs.getDocument({ data: buf }).promise;
       const info = doc._pdfInfo || {};
       const metaData = await doc.getMetadata().catch(() => ({}));
@@ -62,6 +63,23 @@ export default function PdfMetaPage() {
           {fileName && <div className="text-xs text-text-tertiary text-center">{fileName}</div>}
           {meta && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5">
+              <div className="flex items-center justify-end">
+                <CopyButton
+                  text={[
+                    `Pages: ${meta.pages}`,
+                    `Title: ${meta.title}`,
+                    `Author: ${meta.author}`,
+                    `Subject: ${meta.subject}`,
+                    `Keywords: ${meta.keywords}`,
+                    `Creator: ${meta.creator}`,
+                    `Producer: ${meta.producer}`,
+                    `Created: ${meta.created}`,
+                    `Modified: ${meta.modified}`,
+                    `File Size: ${meta.size}`,
+                  ].join('\n')}
+                  className="text-xs"
+                />
+              </div>
               {[
                 { label: 'Pages', value: meta.pages },
                 { label: 'Title', value: meta.title },

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function PdfInfoPage() {
@@ -69,6 +70,24 @@ export default function PdfInfoPage() {
           {error && <div className="text-cat-text text-xs bg-cat-text/10 rounded-lg px-3 py-2 border border-cat-text/20">{error}</div>}
           {info && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+              <div className="flex items-center justify-end">
+                <CopyButton
+                  text={[
+                    `Pages: ${info.pages}`,
+                    `PDF Version: ${info.version}`,
+                    `File Size: ${info.sizeKB} KB`,
+                    `Title: ${info.title}`,
+                    `Author: ${info.author}`,
+                    `Creator: ${info.creator}`,
+                    `Producer: ${info.producer}`,
+                    `Created: ${info.created}`,
+                    `Modified: ${info.modified}`,
+                    `Encrypted: ${info.encrypted}`,
+                    `Page Sizes: ${info.pageSizes.map(p => `${p.width}x${p.height}`).join(', ')}`,
+                  ].join('\n')}
+                  className="text-xs"
+                />
+              </div>
               <div className="flex justify-between py-1.5 px-3 rounded-lg bg-surface border border-border/50 text-sm">
                 <span className="text-text-tertiary">Pages</span><span className="font-mono text-text">{info.pages}</span>
               </div>

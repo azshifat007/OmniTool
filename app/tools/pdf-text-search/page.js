@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function PdfTextSearchPage() {
@@ -80,7 +81,10 @@ export default function PdfTextSearchPage() {
                   placeholder="Search term..." className="flex-1 bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors" />
                 <button onClick={search} className="px-4 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Search</button>
               </div>
-              <div className="text-xs text-text-tertiary">{matches.length} match{matches.length !== 1 ? 'es' : ''} found</div>
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-text-tertiary">{matches.length} match{matches.length !== 1 ? 'es' : ''} found</div>
+                {matches.length > 0 && <CopyButton text={matches.map(m => `L${m.page}: ${m.line}`).join('\n')} className="text-xs" />}
+              </div>
               <div className="space-y-1 max-h-80 overflow-y-auto">
                 {matches.map((m, i) => (
                   <div key={i} className="text-xs font-mono bg-surface rounded-lg px-3 py-2 border border-border/50 text-text-secondary">
