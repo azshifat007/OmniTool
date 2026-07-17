@@ -66,15 +66,25 @@ export default function AspectGenPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {[{ w: 1920, h: 1080, l: '16:9' }, { w: 1920, h: 1200, l: '16:10' }, { w: 1080, h: 1080, l: '1:1' }, { w: 1080, h: 1920, l: '9:16' }, { w: 1200, h: 800, l: '3:2' }, { w: 1024, h: 768, l: '4:3' }, { w: 3840, h: 2160, l: '4K' }].map(p => (
+              {[{ w: 1920, h: 1080, l: '16:9' }, { w: 1920, h: 1200, l: '16:10' }, { w: 1080, h: 1080, l: '1:1' }, { w: 1080, h: 1920, l: '9:16' }, { w: 1200, h: 800, l: '3:2' }, { w: 1024, h: 768, l: '4:3' }, { w: 3840, h: 2160, l: '4K' }, { w: 1200, h: 630, l: 'OG' }, { w: 1500, h: 500, l: 'Banner' }].map(p => (
                 <button key={p.l} onClick={() => { setWidth(p.w); setHeight(p.h); }}
                   className="px-2 py-1 text-[10px] font-medium rounded-md bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">{p.l}</button>
               ))}
             </div>
             <button onClick={generate} className="w-full px-4 py-2.5 text-sm font-medium rounded-xl bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Generate</button>
             {width && height > 0 && (
-              <div className="bg-surface rounded-lg px-3 py-2 text-xs text-text-secondary border border-border/50 text-center">
-                Ratio: {width / gcd(parseInt(width), parseInt(height))}:{height / gcd(parseInt(width), parseInt(height))} ({(parseInt(width) / parseInt(height)).toFixed(4)})
+              <div className="space-y-2">
+                <div className="bg-surface rounded-lg px-3 py-2 text-xs text-text-secondary border border-border/50 text-center">
+                  Ratio: {width / gcd(parseInt(width), parseInt(height))}:{height / gcd(parseInt(width), parseInt(height))} ({(parseInt(width) / parseInt(height)).toFixed(4)})
+                </div>
+                <div className="bg-surface rounded-lg px-3 py-2 text-xs text-text-secondary border border-border/50 space-y-1">
+                  <div className="text-text-tertiary mb-1">Scaled to common widths:</div>
+                  {[320, 640, 768, 1024].map(sw => {
+                    const sc = sw / parseInt(width);
+                    const sh = Math.round(parseInt(height) * sc);
+                    return <div key={sw} className="flex justify-between"><span>{sw}px wide</span><span className="font-mono text-text">{sw} × {sh}</span></div>;
+                  })}
+                </div>
               </div>
             )}
           </div>

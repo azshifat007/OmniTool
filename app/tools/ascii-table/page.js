@@ -1,9 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
+
+const columns = [
+  { key: 'dec', label: 'Dec' },
+  { key: 'hex', label: 'Hex' },
+  { key: 'oct', label: 'Oct' },
+  { key: 'bin', label: 'Bin' },
+  { key: 'char', label: 'Char' },
+  { key: 'html', label: 'HTML' },
+];
 
 const asciiRows = Array.from({ length: 128 }, (_, i) => {
   const char = i <= 32
@@ -38,6 +48,8 @@ const groups = [
 export default function AsciiTablePage() {
   const { addEntry } = useHistory();
   const [search, setSearch] = useState('');
+  const [visible, setVisible] = useState({ dec: true, hex: true, oct: true, bin: true, char: true, html: true });
+  const [copied, setCopied] = useState(null);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return asciiRows;
@@ -50,6 +62,23 @@ export default function AsciiTablePage() {
     );
   }, [search]);
 
+  const copyRow = useCallback((r) => {
+    const obj = Object.fromEntries(columns.map(c => [c.key, r[c.key]]));
+    navigator.clipboard.writeText(JSON.stringify(obj));
+    addEntry('ASCII Table');
+    setCopied(r.dec);
+    setTimeout(() => setCopied((c) => c === r.dec ? null : c), 1200);
+  }, [addEntry]);
+
+  const copyChar = useCallback((r) => {
+    if (typeof r.char === 'string') {
+      navigator.clipboard.writeText(r.char);
+      addEntry('ASCII Table');
+    }
+  }, [addEntry]);
+
+  const toggleCol = (key) => setVisible((v) => ({ ...v, [key]: !v[key] }));
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -58,10 +87,20 @@ export default function AsciiTablePage() {
       </div>
 
       <GlassCard>
-        <div className="p-4">
-          <label className="text-xs text-text-tertiary mb-2 block">Search by dec, hex, binary, or character</label>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. 65, 4A, 01000001, A"
-            className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+        <div className="p-4 space-y-3">
+          <div>
+            <label className="text-xs text-text-tertiary mb-2 block">Search by dec, hex, binary, or character</label>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. 65, 4A, 01000001, A"
+              className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {columns.map(c => (
+              <button key={c.key} onClick={() => toggleCol(c.key)}
+                className={`px-2 py-1 text-[10px] font-medium rounded-md transition-all cursor-pointer ${visible[c.key] ? 'bg-primary text-white' : 'bg-surface border border-border text-text-secondary'}`}>
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
       </GlassCard>
 
@@ -77,24 +116,28 @@ export default function AsciiTablePage() {
                   <table className="w-full text-xs font-mono">
                     <thead>
                       <tr className="text-text-tertiary border-b border-border">
-                        <th className="text-left py-1.5 pr-2">Dec</th>
-                        <th className="text-left py-1.5 pr-2">Hex</th>
-                        <th className="text-left py-1.5 pr-2">Oct</th>
-                        <th className="text-left py-1.5 pr-2">Bin</th>
-                        <th className="text-left py-1.5 pr-2">Char</th>
-                        <th className="text-left py-1.5">HTML</th>
+                        {columns.filter(c => visible[c.key]).map(c => (
+                          <th key={c.key} className="text-left py-1.5 pr-2">{c.label}</th>
+                        ))}
+                        <th className="text-left py-1.5">JSON</th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map(r => (
-                        <tr key={r.dec} onClick={() => { navigator.clipboard.writeText(r.char); addEntry('ASCII Table'); }}
+                        <tr key={r.dec} onClick={() => copyChar(r)} title="Click to copy character"
                           className="border-b border-border/30 last:border-0 hover:bg-surface/50 cursor-pointer transition-colors">
-                          <td className="py-1 pr-2 text-text">{r.dec}</td>
-                          <td className="py-1 pr-2 text-text-secondary">{r.hex}</td>
-                          <td className="py-1 pr-2 text-text-tertiary">{r.oct}</td>
-                          <td className="py-1 pr-2 text-text-tertiary">{r.bin}</td>
-                          <td className={`py-1 pr-2 ${r.dec < 33 || r.dec === 127 ? 'text-text-tertiary italic' : 'text-text font-bold'}`}>{r.char}</td>
-                          <td className="py-1 text-text-tertiary">{r.html}</td>
+                          {visible.dec && <td className="py-1 pr-2 text-text">{r.dec}</td>}
+                          {visible.hex && <td className="py-1 pr-2 text-text-secondary">{r.hex}</td>}
+                          {visible.oct && <td className="py-1 pr-2 text-text-tertiary">{r.oct}</td>}
+                          {visible.bin && <td className="py-1 pr-2 text-text-tertiary">{r.bin}</td>}
+                          {visible.char && <td className={`py-1 pr-2 ${r.dec < 33 || r.dec === 127 ? 'text-text-tertiary italic' : 'text-text font-bold'}`}>{r.char}</td>}
+                          {visible.html && <td className="py-1 text-text-tertiary">{r.html}</td>}
+                          <td className="py-1">
+                            <button onClick={(e) => { e.stopPropagation(); copyRow(r); }}
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">
+                              {copied === r.dec ? 'Copied!' : 'copy'}
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

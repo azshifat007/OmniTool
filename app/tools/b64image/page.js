@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -41,6 +41,20 @@ export default function B64ImagePage() {
     reader.readAsDataURL(file);
   }, [addEntry]);
 
+  const download = useCallback(() => {
+    if (!preview) return;
+    const a = document.createElement('a');
+    a.href = preview;
+    a.download = `image.${mime.split('/')[1]}`;
+    a.click();
+  }, [preview, mime]);
+
+  const stats = useMemo(() => {
+    if (!input.trim()) return null;
+    const cleaned = input.trim().replace(/^data:image\/\w+;base64,/, '');
+    return { chars: cleaned.length, bytes: Math.round(cleaned.length * 3 / 4) };
+  }, [input]);
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -68,14 +82,20 @@ export default function B64ImagePage() {
               </label>
               {input && <CopyButton text={input} />}
             </div>
+            {stats && (
+              <div className="text-[10px] text-text-secondary font-mono">{(stats.bytes / 1024).toFixed(1)} KB ({stats.chars} chars)</div>
+            )}
           </div>
         </GlassCard>
         <GlassCard>
           <div className="p-4">
             <span className="text-xs text-text-tertiary mb-3 block">Preview</span>
             {preview ? (
-              <div className="flex items-center justify-center bg-surface rounded-lg border border-border/50 p-4 min-h-[200px]">
-                <img src={preview} alt="Base64 preview" className="max-w-full max-h-[300px] object-contain rounded" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-center bg-surface rounded-lg border border-border/50 p-4 min-h-[200px]">
+                  <img src={preview} alt="Base64 preview" className="max-w-full max-h-[300px] object-contain rounded" />
+                </div>
+                <button onClick={download} className="w-full rounded-xl px-4 py-2 text-xs font-medium bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Download Image</button>
               </div>
             ) : (
               <div className="flex items-center justify-center bg-surface rounded-lg border border-border/50 p-4 min-h-[200px]">

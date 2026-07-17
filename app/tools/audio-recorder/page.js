@@ -11,18 +11,39 @@ export default function AudioRecorderPage() {
   const [blob, setBlob] = useState(null);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState('');
+  const [level, setLevel] = useState(0);
+  const [quality, setQuality] = useState('audio/webm');
   const mediaRecorder = useRef(null);
   const chunks = useRef([]);
   const timerRef = useRef(null);
   const audioRef = useRef(null);
+  const analyserRef = useRef(null);
 
   const startRecording = useCallback(async () => {
     setError('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4' });
+      const mime = MediaRecorder.isTypeSupported(quality) ? quality : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4');
+      const recorder = new MediaRecorder(stream, { mimeType: mime });
       mediaRecorder.current = recorder;
       chunks.current = [];
+
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const src = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      src.connect(analyser);
+      analyserRef.current = { ctx, analyser, data: new Uint8Array(analyser.frequencyBinCount) };
+      const tick = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.analyser.getByteTimeDomainData(analyserRef.current.data);
+        let sum = 0;
+        for (const v of analyserRef.current.data) sum += Math.abs(v - 128);
+        setLevel(Math.min(100, (sum / analyserRef.current.data.length) * 1.5));
+        requestAnimationFrame(tick);
+      };
+      tick();
 
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.current.push(e.data);
@@ -34,6 +55,8 @@ export default function AudioRecorderPage() {
         stream.getTracks().forEach((t) => t.stop());
         clearInterval(timerRef.current);
         setDuration(0);
+        setLevel(0);
+        if (analyserRef.current) { analyserRef.current.ctx.close(); analyserRef.current = null; }
       };
 
       recorder.start();
@@ -45,7 +68,7 @@ export default function AudioRecorderPage() {
     } catch (e) {
       setError(e.message || 'Microphone access denied');
     }
-  }, [addEntry]);
+  }, [addEntry, quality]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorder.current && mediaRecorder.current.state !== 'inactive') {
@@ -95,12 +118,25 @@ export default function AudioRecorderPage() {
 
             <div className="text-4xl font-mono font-bold text-text">{formatTime(duration)}</div>
 
+            <div className="w-full max-w-[200px] h-2 bg-surface rounded-full overflow-hidden border border-border/50">
+              <div className="h-full bg-cat-media transition-all" style={{ width: `${level}%` }} />
+            </div>
+
             <button onClick={recording ? stopRecording : startRecording}
               className={`w-20 h-20 rounded-full text-sm font-bold transition-all cursor-pointer shadow-lg ${
                 recording ? 'bg-cat-text text-white hover:bg-red-600' : 'bg-primary text-white hover:bg-primary-dark'
               }`}>
               {recording ? '■' : '▶'}
             </button>
+
+            {!recording && (
+              <select value={quality} onChange={(e) => setQuality(e.target.value)}
+                className="bg-surface rounded-lg px-3 py-1.5 text-xs text-text border border-border focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                {['audio/webm', 'audio/mp4', 'audio/ogg'].map(q => (
+                  <option key={q} value={q}>{q.split('/')[1].toUpperCase()}</option>
+                ))}
+              </select>
+            )}
 
             {error && <div className="text-xs text-cat-text">{error}</div>}
           </div>
@@ -116,7 +152,7 @@ export default function AudioRecorderPage() {
                   <button onClick={download} className="flex-1 rounded-xl px-4 py-2 text-xs font-medium bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Download</button>
                   <button onClick={() => setBlob(null)} className="px-4 py-2 text-xs font-medium rounded-xl bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">Discard</button>
                 </div>
-                <div className="text-[10px] text-text-secondary font-mono">{(blob.size / 1024).toFixed(1)} KB</div>
+                <div className="text-[10px] text-text-secondary font-mono">{(blob.size / 1024).toFixed(1)} KB · {blob.type}</div>
               </div>
             </GlassCard>
           )}
@@ -126,7 +162,7 @@ export default function AudioRecorderPage() {
               <span className="text-xs text-text-tertiary mb-3 block">Info</span>
               <div className="space-y-1 text-[11px] text-text-secondary leading-relaxed">
                 <div>• Records from your microphone</div>
-                <div>• Format: WebM/MP4 audio</div>
+                <div>• Live input level meter</div>
                 <div>• All processing is local</div>
               </div>
             </div>
