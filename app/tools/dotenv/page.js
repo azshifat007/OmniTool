@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -41,6 +41,10 @@ function toYaml(entries) {
   return entries.map((e) => `${e.key}: "${e.value.replace(/"/g, '\\"')}"`).join('\n');
 }
 
+function toEnv(entries) {
+  return entries.map((e) => `${e.key}=${e.value}`).join('\n');
+}
+
 const samples = [
   'Simple',
   'With Quotes',
@@ -57,19 +61,26 @@ export default function DotenvPage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('json');
-  const [parsed, setParsed] = useState(null);
-  const [error, setError] = useState('');
+  const [newKey, setNewKey] = useState('');
+  const [newVal, setNewVal] = useState('');
 
-  const parse = () => {
-    const result = parseEnv(input);
-    setParsed(result.entries);
-    setError(result.error || '');
+  const { parsed, error } = useMemo(() => {
+    if (!input.trim()) return { parsed: null, error: '' };
     addEntry('Dotenv Parser');
-  };
+    const result = parseEnv(input);
+    return { parsed: result.entries, error: result.error || '' };
+  }, [input, addEntry]);
 
   const resultText = parsed
-    ? output === 'json' ? toJson(parsed) : toYaml(parsed)
+    ? output === 'json' ? toJson(parsed) : output === 'yaml' ? toYaml(parsed) : toEnv(parsed)
     : '';
+
+  const addEntry2 = () => {
+    if (!newKey.trim()) return;
+    const line = newVal.includes(' ') || newVal.includes('#') ? `${newKey.trim()}="${newVal}"` : `${newKey.trim()}=${newVal}`;
+    setInput(prev => prev ? `${prev}\n${line}` : line);
+    setNewKey(''); setNewVal('');
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -81,10 +92,7 @@ export default function DotenvPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <GlassCard>
           <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-text-tertiary">Input (.env)</label>
-              <button onClick={parse} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Parse</button>
-            </div>
+            <label className="text-xs text-text-tertiary">Input (.env)</label>
             <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={10} placeholder="KEY=VALUE"
               className="w-full bg-surface rounded-lg px-3 py-2 text-xs font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
             <div className="flex flex-wrap gap-2">
@@ -92,6 +100,16 @@ export default function DotenvPage() {
                 <button key={name} onClick={() => setInput(sampleTexts[i])}
                   className="text-[10px] px-2 py-1 rounded bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">{name}</button>
               ))}
+            </div>
+            <div className="bg-surface rounded-lg p-2 border border-border/50 space-y-2">
+              <div className="text-[10px] text-text-tertiary">Add Key</div>
+              <div className="flex gap-2">
+                <input value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="KEY"
+                  className="flex-1 bg-surface rounded-lg px-2 py-1.5 text-[11px] font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+                <input value={newVal} onChange={(e) => setNewVal(e.target.value)} placeholder="value"
+                  className="flex-1 bg-surface rounded-lg px-2 py-1.5 text-[11px] font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+                <button onClick={addEntry2} className="px-2.5 py-1.5 text-[11px] font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">Add</button>
+              </div>
             </div>
           </div>
         </GlassCard>
@@ -120,10 +138,10 @@ export default function DotenvPage() {
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex gap-2">
-                      <button onClick={() => setOutput('json')}
-                        className={`px-2 py-1 text-[10px] font-medium rounded transition-all cursor-pointer ${output === 'json' ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border'}`}>JSON</button>
-                      <button onClick={() => setOutput('yaml')}
-                        className={`px-2 py-1 text-[10px] font-medium rounded transition-all cursor-pointer ${output === 'yaml' ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border'}`}>YAML</button>
+                      {[['json', 'JSON'], ['yaml', 'YAML'], ['env', '.env']].map(([v, l]) => (
+                        <button key={v} onClick={() => setOutput(v)}
+                          className={`px-2 py-1 text-[10px] font-medium rounded transition-all cursor-pointer ${output === v ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border'}`}>{l}</button>
+                      ))}
                     </div>
                     <CopyButton text={resultText} />
                   </div>
@@ -133,6 +151,7 @@ export default function DotenvPage() {
             </>
           )}
 
+          {!parsed && input && <div className="text-xs text-text-tertiary">No valid keys found.</div>}
           {error && <div className="text-xs text-cat-text">{error}</div>}
         </div>
       </div>

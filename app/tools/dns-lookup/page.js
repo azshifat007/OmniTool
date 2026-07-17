@@ -15,6 +15,7 @@ export default function DnsLookupPage() {
   const [records, setRecords] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
   const lookup = useCallback(async () => {
     setError('');
@@ -30,6 +31,7 @@ export default function DnsLookupPage() {
       const data = await res.json();
       if (data.Status === 3) { setError('Domain not found (NXDOMAIN).'); setRecords(null); return; }
       setRecords(data);
+      setHistory(h => [`${type} ${d}`, ...h].slice(0, 8));
     } catch (e) {
       setError('Lookup failed: ' + e.message);
     } finally {
@@ -65,11 +67,27 @@ export default function DnsLookupPage() {
               {loading ? 'Looking up...' : 'Lookup'}
             </button>
             {error && <div className="text-cat-text text-xs bg-cat-text/10 rounded-lg px-3 py-2 border border-cat-text/20">{error}</div>}
+            {history.length > 0 && (
+              <div className="mt-3">
+                <div className="text-xs text-text-tertiary mb-1">Recent</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {history.map((h, i) => (
+                    <button key={i} onClick={() => { const [t, ...rest] = h.split(' '); setType(t); setDomain(rest.join(' ')); }}
+                      className="px-2 py-1 text-[10px] rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">{h}</button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </GlassCard>
         <GlassCard>
           <div className="p-4">
-            <span className="text-xs text-text-tertiary mb-3 block">Records</span>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-text-tertiary">Records</span>
+              {records?.Answer && (
+                <CopyButton text={records.Answer.map(r => `${r.type} ${r.data}`).join('\n')} className="text-xs" />
+              )}
+            </div>
             {!records ? (
               <div className="text-text-tertiary text-sm">Enter a domain and click Lookup.</div>
             ) : (

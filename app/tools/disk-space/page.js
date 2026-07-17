@@ -1,18 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function DiskSpacePage() {
   const { addEntry } = useHistory();
   const [info, setInfo] = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     addEntry('Disk Space Checker');
     if (!navigator.storage || !navigator.storage.estimate) {
-      setInfo({ available: 'API not supported', used: 'N/A', quota: 'N/A', usage: 0 });
+      setInfo({ available: 'API not supported', used: 'N/A', quota: 'N/A', usage: 0, pct: 0 });
       return;
     }
     navigator.storage.estimate().then(est => {
@@ -23,10 +24,12 @@ export default function DiskSpacePage() {
         quota: quota / 1048576,
         usage,
         quotaBytes: quota,
-        pct: (usage / quota) * 100,
+        pct: quota ? (usage / quota) * 100 : 0,
       });
     });
   }, [addEntry]);
+
+  useEffect(() => { load(); }, [load]);
 
   const fmt = (mb) => {
     if (typeof mb !== 'number') return mb;
@@ -35,6 +38,8 @@ export default function DiskSpacePage() {
   };
 
   if (!info) return null;
+
+  const copyText = `Used: ${fmt(info.used)}\nAvailable: ${fmt(info.available)}\nTotal Quota: ${fmt(info.quota)}\nUsage: ${info.pct.toFixed(1)}%`;
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -79,8 +84,14 @@ export default function DiskSpacePage() {
                   <div className="text-xs text-text-tertiary mt-1">Total Quota</div>
                 </div>
               </div>
+              <div className="flex justify-center">
+                <CopyButton text={copyText} className="text-xs" />
+              </div>
             </div>
           )}
+          <div className="flex justify-center mt-4">
+            <button onClick={load} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">↻ Refresh</button>
+          </div>
         </div>
       </GlassCard>
     </motion.div>
