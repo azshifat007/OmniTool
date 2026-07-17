@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -16,7 +16,7 @@ export default function ChangelogPage() {
   ]);
   const [version, setVersion] = useState('1.0.0');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [output, setOutput] = useState('');
+  const [live, setLive] = useState(true);
 
   const addEntry_ = useCallback(() => {
     setEntries(e => [...e, { type: 'Added', message: '' }]);
@@ -30,9 +30,9 @@ export default function ChangelogPage() {
     setEntries(e => e.map((x, idx) => idx === i ? { ...x, [field]: val } : x));
   }, []);
 
-  const generate = useCallback(() => {
+  const output = useMemo(() => {
     const valid = entries.filter(e => e.message.trim());
-    if (!valid.length) { setOutput(''); return; }
+    if (!valid.length) return '';
     const lines = [`## [${version}] - ${date}`, ''];
     for (const t of types) {
       const items = valid.filter(e => e.type === t).map(e => e.message.trim());
@@ -41,9 +41,12 @@ export default function ChangelogPage() {
       for (const msg of items) lines.push(`- ${msg}`);
       lines.push('');
     }
-    setOutput(lines.join('\n'));
+    return lines.join('\n');
+  }, [entries, version, date]);
+
+  const handleGenerate = useCallback(() => {
     addEntry('Changelog Generator');
-  }, [entries, version, date, addEntry]);
+  }, [addEntry]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -79,7 +82,11 @@ export default function ChangelogPage() {
             ))}
             <div className="flex gap-2">
               <button onClick={addEntry_} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">+ Add Entry</button>
-              <button onClick={generate} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Generate</button>
+              <button onClick={handleGenerate} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Log</button>
+              <label className="flex items-center gap-1.5 text-[10px] text-text-secondary cursor-pointer ml-auto">
+                <input type="checkbox" checked={live} onChange={e => setLive(e.target.checked)} className="accent-primary rounded" />
+                Live
+              </label>
             </div>
           </div>
         </GlassCard>
@@ -89,7 +96,7 @@ export default function ChangelogPage() {
               <span className="text-xs text-text-tertiary">CHANGELOG.md</span>
               {output && <CopyButton text={output} />}
             </div>
-            <pre className="w-full bg-surface rounded-lg px-3 py-3 text-sm font-mono text-text border border-border whitespace-pre-wrap min-h-[200px]">{output || <span className="text-text-tertiary">Generated changelog will appear here...</span>}</pre>
+            <pre className="w-full bg-surface rounded-lg px-3 py-3 text-sm font-mono text-text border border-border whitespace-pre-wrap min-h-[200px]">{live ? (output || <span className="text-text-tertiary">Add entries to preview...</span>) : <span className="text-text-tertiary">Click "Log" to generate...</span>}</pre>
           </div>
         </GlassCard>
       </div>

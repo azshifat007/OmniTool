@@ -52,12 +52,17 @@ function beautifyCSS(css) {
   return out.join('\n');
 }
 
+function beautifyJSON(code) {
+  return JSON.stringify(JSON.parse(code), null, 2);
+}
+
 export default function CodeBeautifierPage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('');
   const [mode, setMode] = useState('js');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
+  const [live, setLive] = useState(false);
 
   const handleBeautify = useCallback(() => {
     if (!input.trim()) { setOutput(''); setError(''); return; }
@@ -66,6 +71,7 @@ export default function CodeBeautifierPage() {
       let result;
       if (mode === 'js') result = beautifyJS(input);
       else if (mode === 'html') result = beautifyHTML(input);
+      else if (mode === 'json') result = beautifyJSON(input);
       else result = beautifyCSS(input);
       setOutput(result);
       addEntry('Code Beautifier');
@@ -75,6 +81,23 @@ export default function CodeBeautifierPage() {
     }
   }, [input, mode, addEntry]);
 
+  const handleInput = useCallback((e) => {
+    setInput(e.target.value);
+    if (live) {
+      try {
+        let result;
+        if (mode === 'js') result = beautifyJS(e.target.value);
+        else if (mode === 'html') result = beautifyHTML(e.target.value);
+        else if (mode === 'json') result = beautifyJSON(e.target.value);
+        else result = beautifyCSS(e.target.value);
+        setOutput(result);
+        setError('');
+      } catch {
+        setError('Invalid syntax — fix to preview');
+      }
+    }
+  }, [live, mode]);
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -83,13 +106,17 @@ export default function CodeBeautifierPage() {
       </div>
       <div className="mb-4">
         <GlassCard>
-          <div className="p-3 flex gap-2">
-            {['js', 'html', 'css'].map((m) => (
+          <div className="p-3 flex flex-wrap items-center gap-2">
+            {['js', 'html', 'css', 'json'].map((m) => (
               <button key={m} onClick={() => { setMode(m); setOutput(''); setError(''); }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
                   mode === m ? 'bg-primary text-white' : 'text-text-tertiary hover:text-text bg-surface border border-border'
                 }`}>{m.toUpperCase()}</button>
             ))}
+            <label className="flex items-center gap-1.5 text-[10px] text-text-secondary cursor-pointer ml-auto">
+              <input type="checkbox" checked={live} onChange={e => setLive(e.target.checked)} className="accent-primary rounded" />
+              Live
+            </label>
           </div>
         </GlassCard>
       </div>
@@ -97,7 +124,7 @@ export default function CodeBeautifierPage() {
         <GlassCard>
           <div className="p-4">
             <label className="text-xs text-text-tertiary mb-3 block">Input Code</label>
-            <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={14}
+            <textarea value={input} onChange={handleInput} rows={14}
               className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors resize-none"
               placeholder="Paste messy code here..." />
           </div>

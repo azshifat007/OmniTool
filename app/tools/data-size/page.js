@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -8,32 +8,39 @@ import { useHistory } from '@/components/HistoryProvider';
 
 const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
-function convert(value, from, to) {
+function convert(value, from, to, base) {
   if (from === to) return value;
   const fromIdx = units.indexOf(from);
   const toIdx = units.indexOf(to);
   const diff = toIdx - fromIdx;
-  return value / Math.pow(1024, diff);
+  return value / Math.pow(base, diff);
 }
 
 export default function DataSizePage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('1');
   const [fromUnit, setFromUnit] = useState('GB');
-  const [results, setResults] = useState(null);
+  const [base, setBase] = useState(1024);
   const [error, setError] = useState('');
 
-  const handleConvert = useCallback(() => {
+  const results = useMemo(() => {
     setError('');
     const val = parseFloat(input);
-    if (isNaN(val) || val < 0) { setError('Enter a valid positive number.'); setResults(null); return; }
-    const converted = {};
-    for (const u of units) {
-      converted[u] = convert(val, fromUnit, u);
+    if (input === '' || isNaN(val) || val < 0) {
+      if (input !== '') setError('Enter a valid positive number.');
+      return null;
     }
-    setResults(converted);
+    const converted = {};
+    for (const u of units) converted[u] = convert(val, fromUnit, u, base);
     addEntry('Data Size Converter');
-  }, [input, fromUnit, addEntry]);
+    return converted;
+  }, [input, fromUnit, base, addEntry]);
+
+  const getBits = () => {
+    if (!results) return '';
+    const bytes = results['B'];
+    return Math.round(bytes * 8).toLocaleString();
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -56,7 +63,14 @@ export default function DataSizePage() {
                 {units.map(u => <option key={u} value={u}>{u}</option>)}
               </select>
             </div>
-            <button onClick={handleConvert} className="px-4 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Convert</button>
+          </div>
+          <div className="flex gap-2">
+            {[1024, 1000].map(b => (
+              <button key={b} onClick={() => setBase(b)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${base === b ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'}`}>
+                {b === 1024 ? 'Binary (1024)' : 'Decimal (1000)'}
+              </button>
+            ))}
           </div>
         </div>
       </GlassCard>
@@ -64,12 +78,19 @@ export default function DataSizePage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-5">
           <GlassCard>
             <div className="p-4 space-y-1.5">
-              {units.filter(u => results[u] >= 0).map((u) => (
+              {units.map((u) => (
                 <div key={u} className="flex items-center justify-between py-2 px-3 rounded-lg bg-surface border border-border/50">
                   <span className="text-sm font-medium text-text">{u}</span>
-                  <span className="text-sm font-mono text-text-secondary">{results[u] < 0.001 ? '< 0.001' : results[u].toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-mono text-text-secondary">{results[u] < 0.001 ? '< 0.001' : results[u].toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                    <CopyButton text={String(results[u] < 0.001 ? '< 0.001' : results[u].toLocaleString(undefined, { maximumFractionDigits: 4 }))} className="text-[10px]" />
+                  </div>
                 </div>
               ))}
+              <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-primary/10 border border-primary/20">
+                <span className="text-sm font-medium text-text">Bits</span>
+                <span className="text-sm font-mono text-text">{getBits()}</span>
+              </div>
             </div>
           </GlassCard>
         </motion.div>

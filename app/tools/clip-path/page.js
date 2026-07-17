@@ -24,6 +24,7 @@ export default function ClipPathPage() {
   const [selected, setSelected] = useState(shapes[0]);
   const [custom, setCustom] = useState('');
   const [bgColor, setBgColor] = useState('#6C5CE7');
+  const [size, setSize] = useState(200);
   const output = custom || selected.value;
 
   const handleShape = useCallback((s) => {
@@ -57,35 +58,44 @@ export default function ClipPathPage() {
               <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="polygon(...)"
                 className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
             </div>
-            <div>
-              <label className="text-xs text-text-tertiary mb-2 block">Background Color</label>
-              <div className="flex items-center gap-3">
-                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)}
-                  className="w-10 h-10 rounded-lg border border-border cursor-pointer" />
-                <span className="text-sm font-mono text-text-secondary">{bgColor}</span>
-              </div>
-            </div>
-          </div>
-        </GlassCard>
-        <div className="space-y-4">
-          <GlassCard>
-            <div className="p-4">
-              <span className="text-xs text-text-tertiary mb-3 block">Preview</span>
-              <div className="flex items-center justify-center bg-surface rounded-lg border border-border/50 p-6 min-h-[180px]">
-                <div style={{ clipPath: output, background: bgColor, width: 200, height: 200 }} />
-              </div>
-            </div>
-          </GlassCard>
-          <GlassCard>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-text-tertiary">CSS</span>
-                <CopyButton text={`clip-path: ${output};`} />
-              </div>
-              <pre className="bg-surface rounded-lg px-3 py-2.5 text-sm font-mono text-text border border-border whitespace-pre-wrap">clip-path: {output};</pre>
-            </div>
-          </GlassCard>
-        </div>
+             <div>
+               <label className="text-xs text-text-tertiary mb-2 block">Background Color</label>
+               <div className="flex items-center gap-3">
+                 <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)}
+                   className="w-10 h-10 rounded-lg border border-border cursor-pointer" />
+                 <span className="text-sm font-mono text-text-secondary">{bgColor}</span>
+               </div>
+             </div>
+             <div>
+               <label className="text-xs text-text-tertiary mb-1 block">Preview Size: {size}px</label>
+               <input type="range" min={80} max={320} value={size} onChange={(e) => setSize(parseInt(e.target.value))}
+                 className="w-full accent-primary cursor-pointer" />
+             </div>
+             <button onClick={() => {
+               const s = shapes[Math.floor(Math.random() * shapes.length)];
+               setSelected(s); setCustom(''); addEntry('CSS Clip Path Generator');
+             }} className="w-full px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">🎲 Random Shape</button>
+           </div>
+         </GlassCard>
+         <div className="space-y-4">
+           <GlassCard>
+             <div className="p-4">
+               <span className="text-xs text-text-tertiary mb-3 block">Preview</span>
+               <div className="flex items-center justify-center bg-surface rounded-lg border border-border/50 p-6 min-h-[180px]">
+                 <div style={{ clipPath: output, background: bgColor, width: size, height: size }} />
+               </div>
+             </div>
+           </GlassCard>
+           <GlassCard>
+             <div className="p-4">
+               <div className="flex items-center justify-between mb-2">
+                 <span className="text-xs text-text-tertiary">CSS</span>
+                 <CopyButton text={`clip-path: ${output};`} />
+               </div>
+               <pre className="bg-surface rounded-lg px-3 py-2.5 text-sm font-mono text-text border border-border whitespace-pre-wrap">clip-path: {output};</pre>
+             </div>
+           </GlassCard>
+         </div>
       </div>
     </motion.div>
   );
