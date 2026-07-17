@@ -3,9 +3,13 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
+import { useHistory } from '@/components/HistoryProvider';
 
 export default function URLParserPage() {
+  const { addEntry } = useHistory();
   const [url, setUrl] = useState('https://example.com/path/to/page?name=value&key=123#section');
+
+  const onChange = (e) => { setUrl(e.target.value); addEntry('URL Parser'); };
 
   const parsed = useMemo(() => {
     try {
@@ -50,7 +54,7 @@ export default function URLParserPage() {
       </div>
       <GlassCard>
         <div className="p-4 space-y-4">
-          <input type="url" value={url} onChange={e => setUrl(e.target.value)}
+          <input type="url" value={url} onChange={onChange}
             placeholder="Enter a URL..."
             className="w-full bg-surface text-text rounded-xl border border-border px-4 py-3 text-sm outline-none focus:border-primary/50 transition-colors placeholder:text-text-tertiary font-mono" />
           {parsed.valid ? (
@@ -87,7 +91,12 @@ export default function URLParserPage() {
                 </>
               )}
               <div className="flex justify-end">
-                <CopyButton text={JSON.stringify(Object.fromEntries(parsed.params), null, 2)} />
+                <CopyButton text={[
+                  ...rows.map(([label, value]) => `${label}: ${value}`),
+                  '',
+                  'Query Parameters:',
+                  ...parsed.params.map(([k, v]) => `  ${k} = ${v}`),
+                ].join('\n')} />
               </div>
             </>
           ) : (

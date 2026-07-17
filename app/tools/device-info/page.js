@@ -2,12 +2,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
+import { useHistory } from '@/components/HistoryProvider';
 
 function section(title, items) {
   return { title, items };
 }
 
 export default function DeviceInfoPage() {
+  const { addEntry } = useHistory();
   const [info, setInfo] = useState([]);
 
   useEffect(() => {
@@ -57,12 +60,21 @@ export default function DeviceInfoPage() {
     ]);
   }, []);
 
+  useEffect(() => { addEntry('Device Info'); }, [addEntry]);
+
+  const allText = info.map(s => `${s.title}\n` + s.items.map(([l, v]) => `  ${l}: ${v}`).join('\n')).join('\n\n');
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
         <span className="text-2xl text-cat-system">ℹ</span>
         <h1 className="font-heading text-2xl font-bold text-text">Device Info</h1>
       </div>
+      {info.length > 0 && (
+        <div className="flex justify-end mb-3">
+          <CopyButton text={allText} />
+        </div>
+      )}
       {info.map(s => (
         <GlassCard key={s.title}>
           <div className="p-4">
