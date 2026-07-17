@@ -37,13 +37,19 @@ export default function AnniversaryPage() {
       daysUntil = diffNext;
     }
 
+    const baseYears = isToday ? years : years - 1;
+    const milestones = [1, 5, 10, 25, 50, 60, 100];
+    const nextMilestone = milestones.find((m) => m > baseYears);
+
     setResult({
       name: name.trim() || 'Event',
       daysUntil,
       isToday,
-      years: isToday ? years : years - 1,
+      years: baseYears,
       nextDate: nextDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
       dayOfWeek: nextDate.toLocaleDateString('en-US', { weekday: 'long' }),
+      nextMilestone: nextMilestone ? nextMilestone - baseYears : null,
+      milestoneYear: nextMilestone || null,
     });
   }, [name, date, addEntry]);
 
@@ -85,6 +91,12 @@ export default function AnniversaryPage() {
                   <div className="text-sm font-medium text-text">{result.years}</div>
                 </div>
               </div>
+              {result.nextMilestone && (
+                <div className="bg-primary/10 border border-primary/20 rounded-xl px-3 py-2.5">
+                  <div className="text-xs text-cat-success">Next Milestone</div>
+                  <div className="text-sm font-medium text-text">{result.milestoneYear}{result.milestoneYear === 1 ? 'st' : 'th'} anniversary in {result.nextMilestone} year{result.nextMilestone === 1 ? '' : 's'}</div>
+                </div>
+              )}
             </motion.div>
           )}
         </div>

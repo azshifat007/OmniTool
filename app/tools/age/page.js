@@ -81,16 +81,26 @@ export default function AgePage() {
     const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
     const totalWeeks = Math.floor(totalDays / 7);
     const totalHours = Math.floor(totalMs / (1000 * 60 * 60));
+    const totalMinutes = Math.floor(totalMs / (1000 * 60));
+    const totalSeconds = Math.floor(totalMs / 1000);
     const totalMonths = years * 12 + months;
 
     const zodiac = getZodiac(birthDate.getMonth() + 1, birthDate.getDate());
     const chinese = getChineseZodiac(birthDate.getFullYear());
-    const nextBirthday = daysUntilNextBirthday(birthDate.getMonth() + 1, birthDate.getDate(), targetDate);
+    const nextBirthdayDays = daysUntilNextBirthday(birthDate.getMonth() + 1, birthDate.getDate(), targetDate);
+    const ageOnNextBirthday = years + 1;
+    const nextMilestone = (() => {
+      const n = years + 1;
+      for (const m of [10, 13, 16, 18, 21, 30, 40, 50, 60, 70, 80, 90, 100]) {
+        if (m > years) return { year: m, in: m - years };
+      }
+      return null;
+    })();
 
     setResult({
       years, months, days,
-      totalMonths, totalWeeks, totalDays, totalHours,
-      zodiac, chinese, nextBirthday,
+      totalMonths, totalWeeks, totalDays, totalHours, totalMinutes, totalSeconds,
+      zodiac, chinese, nextBirthdayDays, ageOnNextBirthday, nextMilestone,
     });
     addEntry('Age Calculator');
   }, [birth, target, addEntry]);
@@ -136,10 +146,12 @@ export default function AgePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Total Months', value: result.totalMonths },
-                  { label: 'Total Weeks', value: result.totalWeeks },
-                  { label: 'Total Days', value: result.totalDays },
+                  { label: 'Total Months', value: result.totalMonths.toLocaleString() },
+                  { label: 'Total Weeks', value: result.totalWeeks.toLocaleString() },
+                  { label: 'Total Days', value: result.totalDays.toLocaleString() },
                   { label: 'Total Hours', value: result.totalHours.toLocaleString() },
+                  { label: 'Total Minutes', value: result.totalMinutes.toLocaleString() },
+                  { label: 'Total Seconds', value: result.totalSeconds.toLocaleString() },
                 ].map(({ label, value }) => (
                   <div key={label} className="bg-surface rounded-lg px-3 py-2 border border-border/50">
                     <div className="text-xs text-text-tertiary">{label}</div>
@@ -150,11 +162,12 @@ export default function AgePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Next Birthday', value: `in ${result.nextBirthday} days` },
+                  { label: 'Next Birthday', value: `in ${result.nextBirthdayDays} days (turn ${result.ageOnNextBirthday})` },
                   { label: 'Zodiac Sign', value: `${result.zodiac.emoji} ${result.zodiac.name}` },
                   { label: 'Chinese Zodiac', value: result.chinese },
+                  ...(result.nextMilestone ? [{ label: 'Next Milestone', value: `${result.nextMilestone.year} in ${result.nextMilestone.in}y` }] : []),
                 ].map(({ label, value }) => (
-                  <div key={label} className={`bg-surface rounded-lg px-3 py-2 border border-border/50 ${label === 'Chinese Zodiac' || label === 'Zodiac Sign' ? 'col-span-1' : 'col-span-2'}`}>
+                  <div key={label} className={`bg-surface rounded-lg px-3 py-2 border border-border/50 ${label === 'Chinese Zodiac' || label === 'Zodiac Sign' || label === 'Next Milestone' ? 'col-span-1' : 'col-span-2'}`}>
                     <div className="text-xs text-text-tertiary">{label}</div>
                     <div className="text-sm font-mono text-text font-bold">{value}</div>
                   </div>

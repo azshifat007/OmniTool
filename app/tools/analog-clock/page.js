@@ -124,6 +124,11 @@ export default function AnalogClockPage() {
           {timeStr && (
             <div className="mt-3 text-lg font-mono text-text font-bold">{timeStr}</div>
           )}
+          {timeStr && (
+            <div className="text-xs text-text-tertiary">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: tz === 'local' ? undefined : tz })}
+            </div>
+          )}
         </div>
       </GlassCard>
     </motion.div>
