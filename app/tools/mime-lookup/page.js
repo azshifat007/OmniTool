@@ -49,12 +49,17 @@ const MIME_TYPES = [
 export default function MimeLookupPage() {
   const { addEntry } = useHistory();
   const [query, setQuery] = useState('');
+  const [cat, setCat] = useState('All');
+
+  const categories = useMemo(() => ['All', ...Array.from(new Set(MIME_TYPES.map(m => m.cat)))], []);
 
   const results = useMemo(() => {
-    if (!query.trim()) return MIME_TYPES;
+    let list = MIME_TYPES;
+    if (cat !== 'All') list = list.filter(m => m.cat === cat);
+    if (!query.trim()) return list;
     const q = query.toLowerCase();
-    return MIME_TYPES.filter(m => m.type.includes(q) || m.ext.includes(q) || m.desc.toLowerCase().includes(q));
-  }, [query]);
+    return list.filter(m => m.type.includes(q) || m.ext.includes(q) || m.desc.toLowerCase().includes(q));
+  }, [query, cat]);
 
   const catColors = {
     Text: 'text-cat-text', App: 'text-cat-code', Image: 'text-cat-media',
@@ -73,6 +78,14 @@ export default function MimeLookupPage() {
           <p className="text-sm text-text-secondary text-center">Search and browse common MIME types, extensions, and descriptions.</p>
           <input value={query} onChange={(e) => { setQuery(e.target.value); addEntry('MIME Type Lookup'); }} placeholder="Search by type, extension or description..."
             className="w-full bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+          <div className="flex flex-wrap gap-1.5">
+            {categories.map(c => (
+              <button key={c} onClick={() => setCat(c)}
+                className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all cursor-pointer ${cat === c ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'}`}>
+                {c}
+              </button>
+            ))}
+          </div>
           <div className="space-y-1 max-h-96 overflow-y-auto">
             {results.map(m => (
               <div key={m.type} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface border border-border/50">
@@ -85,7 +98,7 @@ export default function MimeLookupPage() {
             ))}
             {results.length === 0 && <div className="text-text-tertiary text-sm text-center py-4">No matching MIME types.</div>}
           </div>
-          <div className="text-xs text-text-tertiary text-center">{MIME_TYPES.length} types listed</div>
+          <div className="text-xs text-text-tertiary text-center">{results.length} of {MIME_TYPES.length} types shown</div>
         </div>
       </GlassCard>
     </motion.div>

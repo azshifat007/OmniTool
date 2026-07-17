@@ -45,12 +45,24 @@ const examples = ['192.168.1.0/24', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.1/
 export default function CidrCalcPage() {
   const { addEntry } = useHistory();
   const [cidr, setCidr] = useState('192.168.1.0/24');
+  const [showHosts, setShowHosts] = useState(false);
 
   const info = useMemo(() => {
     const result = parseCIDR(cidr);
     if (result) addEntry('CIDR Calculator');
     return result;
   }, [cidr, addEntry]);
+
+  const hostList = useMemo(() => {
+    if (!info || info.bits >= 31) return [];
+    const out = [];
+    const limit = Math.min(10, info.totalHosts);
+    for (let i = 0; i < limit; i++) {
+      const ip = info.hostMin + i;
+      out.push([(ip >> 24) & 0xFF, (ip >> 16) & 0xFF, (ip >> 8) & 0xFF, ip & 0xFF].join('.'));
+    }
+    return out;
+  }, [info]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -134,6 +146,34 @@ export default function CidrCalcPage() {
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-primary/40 inline-block" /> Network bits</span>
                   <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-cat-success/30 inline-block" /> Host bits</span>
                 </div>
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-text-tertiary">Host Addresses</span>
+                <button onClick={() => setShowHosts(s => !s)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">
+                  {showHosts ? 'Hide' : `Show first ${Math.min(10, info.totalHosts)}`}
+                </button>
+              </div>
+              {showHosts && (
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {hostList.map((h, i) => (
+                    <div key={i} className="bg-surface rounded-lg px-2 py-1.5 border border-border/50 text-center">
+                      <div className="text-[10px] text-text-tertiary">{i === 0 ? 'First' : `.${i}`}</div>
+                      <div className="text-xs font-mono text-text">{h}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!showHosts && (
+                <div className="text-xs text-text-tertiary">Range: {info.hostMinStr} — {info.hostMaxStr} ({info.totalHosts.toLocaleString()} total)</div>
+              )}
+              <div className="mt-3 flex justify-start">
+                <CopyButton text={`${info.hostMinStr} - ${info.hostMaxStr}`} />
               </div>
             </div>
           </GlassCard>

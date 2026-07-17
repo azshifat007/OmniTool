@@ -21,6 +21,8 @@ const cases = [
   { id: 'train', label: 'Train-Case', fn: s => (s.match(/[a-zA-Z0-9]+/g) || []).map(w => w[0].toUpperCase() + w.slice(1).toLowerCase()).join('-') },
   { id: 'flat', label: 'flatcase', fn: s => s.toLowerCase().replace(/[^a-z0-9]/g, '') },
   { id: 'reverse', label: 'Reverse', fn: s => [...s].reverse().join('') },
+  { id: 'alternating', label: 'aLtErNaTiNg', fn: s => [...s].map((c, i) => i % 2 === 0 ? c.toLowerCase() : c.toUpperCase()).join('') },
+  { id: 'random', label: 'rAnDoM', fn: s => [...s].map(c => Math.random() < 0.5 ? c.toLowerCase() : c.toUpperCase()).join('') },
 ]
 
 const customSeparators = [
@@ -45,6 +47,7 @@ export default function CasePage() {
 
   const words = input.trim() ? input.trim().split(/\s+/).length : 0
   const uniqueWords = input.trim() ? new Set(input.trim().toLowerCase().split(/\s+/)).size : 0
+  const lines = input ? input.split('\n').length : 0
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -60,7 +63,7 @@ export default function CasePage() {
             placeholder="Type or paste text here..."
             className="w-full h-32 bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors resize-none placeholder:text-text-tertiary" />
           <div className="flex items-center justify-between mt-2">
-            <div className="text-xs text-text-tertiary">{input.length} characters · {words} words · {uniqueWords} unique</div>
+            <div className="text-xs text-text-tertiary">{input.length} characters · {words} words · {uniqueWords} unique · {lines} lines</div>
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-1.5 text-[10px] text-text-secondary cursor-pointer">
                 <input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)}

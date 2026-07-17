@@ -73,6 +73,7 @@ function formatDecimal(str) {
 export default function NumwordsPage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('');
+  const [caseStyle, setCaseStyle] = useState('capitalize');
 
   const result = useMemo(() => {
     const val = input.replace(/,/g, '');
@@ -92,11 +93,15 @@ export default function NumwordsPage() {
 
     const ordinal = intPart <= 999999999 ? numberToOrdinal(intPart) : null;
     const roman = intPart >= 1 && intPart <= 3999 ? toRoman(intPart) : null;
+    const currency = `${numberToWords(intPart)} dollar${intPart === 1 ? '' : 's'}${decPart > 0 ? ` and ${numberToWords(decPart)} cents` : ''}`;
 
     addEntry('Number to Words');
 
-    return { words, ordinal, roman, intPart, decPart, formatted: formatDecimal(val) };
-  }, [input, addEntry]);
+    const applyCase = (s) => caseStyle === 'upper' ? s.toUpperCase()
+      : caseStyle === 'lower' ? s.toLowerCase() : s.charAt(0).toUpperCase() + s.slice(1);
+
+    return { words: applyCase(words), ordinal, roman, currency, intPart, decPart, formatted: formatDecimal(val) };
+  }, [input, caseStyle, addEntry]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -121,6 +126,18 @@ export default function NumwordsPage() {
                 {result.decPart > 0 && <span className="font-mono">.{result.decPart}</span>}
               </div>
             )}
+
+            <div>
+              <label className="text-xs text-text-tertiary mb-1 block">Case Style</label>
+              <div className="flex gap-2">
+                {[['capitalize', 'Title'], ['lower', 'lower'], ['upper', 'UPPER']].map(([v, l]) => (
+                  <button key={v} onClick={() => setCaseStyle(v)}
+                    className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all cursor-pointer ${caseStyle === v ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </GlassCard>
 
@@ -143,16 +160,28 @@ export default function NumwordsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {result.ordinal && (
                     <div className="bg-surface rounded-lg px-3 py-2 border border-border/50 col-span-2 lg:col-span-1">
-                      <div className="text-xs text-text-tertiary">Ordinal</div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-text-tertiary">Ordinal</div>
+                        <CopyButton text={result.ordinal} className="text-[10px]" />
+                      </div>
                       <div className="text-sm font-mono text-text">{result.ordinal}</div>
                     </div>
                   )}
                   {result.roman && (
                     <div className="bg-surface rounded-lg px-3 py-2 border border-border/50 col-span-2 lg:col-span-1">
-                      <div className="text-xs text-text-tertiary">Roman Numerals</div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-text-tertiary">Roman Numerals</div>
+                        <CopyButton text={result.roman} className="text-[10px]" />
+                      </div>
                       <div className="text-sm font-mono text-text">{result.roman}</div>
                     </div>
                   )}
+                </div>
+
+                <div className="bg-surface rounded-lg px-3 py-3 border border-border/50">
+                  <div className="text-xs text-text-tertiary mb-1">Currency (English)</div>
+                  <div className="text-sm text-text font-semibold leading-relaxed">{result.currency}</div>
+                  <CopyButton text={result.currency} />
                 </div>
               </>
             )}

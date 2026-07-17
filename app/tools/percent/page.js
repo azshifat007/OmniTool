@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -48,6 +48,16 @@ export default function PercentPage() {
     const pct = (diff / f) * 100;
     setChangeResult({ diff, pct, from: f, to: t });
   }, [fromVal, toVal]);
+
+  const [amount, setAmount] = useState('');
+  const [rate, setRate] = useState('');
+  const discount = useMemo(() => {
+    const a = parseFloat(amount);
+    const r = parseFloat(rate);
+    if (isNaN(a) || isNaN(r)) return null;
+    const saved = (a * r) / 100;
+    return { saved, final: a - saved };
+  }, [amount, rate]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -99,7 +109,41 @@ export default function PercentPage() {
               <div className="bg-surface rounded-lg px-3 py-3 border border-border/50 space-y-1">
                 <div className="text-2xl font-bold text-text">{result.mode === 'xy' ? `${result.value.toFixed(2)}%` : result.value.toFixed(2)}</div>
                 <div className="text-xs font-mono text-text-tertiary">{result.formula}</div>
+                {result.mode === 'xp' && (
+                  <div className="w-full bg-bg rounded-full h-2 overflow-hidden mt-1">
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(100, (result.value / parseFloat(y || 1)) * 100)}%` }} />
+                  </div>
+                )}
                 <CopyButton text={String(result.mode === 'xy' ? `${result.value.toFixed(2)}%` : result.value.toFixed(2))} />
+              </div>
+            )}
+          </div>
+        </GlassCard>
+
+        <GlassCard>
+          <div className="p-4 space-y-4">
+            <span className="text-xs text-text-tertiary block">Discount / Tip Calculator</span>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="text-xs text-text-tertiary mb-1 block">Original Amount</label>
+                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0"
+                  className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-text-tertiary mb-1 block">% Off / Tip</label>
+                <input type="number" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="0"
+                  className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+              </div>
+            </div>
+            {discount && (
+              <div className="bg-surface rounded-lg px-3 py-3 border border-border/50 space-y-1">
+                <div className="flex justify-between text-xs text-text-tertiary">
+                  <span>You save / add</span>
+                  <span className="font-mono text-cat-success">{discount.saved.toFixed(2)}</span>
+                </div>
+                <div className="text-2xl font-bold text-text">{discount.final.toFixed(2)}</div>
+                <div className="text-xs font-mono text-text-tertiary">Final after {rate || 0}%</div>
+                <CopyButton text={discount.final.toFixed(2)} />
               </div>
             )}
           </div>
