@@ -20,14 +20,19 @@ export default function BreathingPage() {
   const [phase, setPhase] = useState('inhale');
   const [count, setCount] = useState(0);
   const [cycles, setCycles] = useState(0);
+  const [sessionSec, setSessionSec] = useState(0);
+  const [custom, setCustom] = useState({ inhale: 4, hold: 4, exhale: 4, rest: 4 });
   const timerRef = useRef(null);
+  const sessionRef = useRef(null);
 
   const start = useCallback(() => {
     setRunning(true);
     setCount(pattern.inhale);
     setPhase('inhale');
     setCycles(0);
+    setSessionSec(0);
     addEntry('Breathing Exercise');
+    sessionRef.current = setInterval(() => setSessionSec((s) => s + 1), 1000);
   }, [pattern, addEntry]);
 
   const stop = useCallback(() => {
@@ -36,6 +41,7 @@ export default function BreathingPage() {
     setCount(0);
     setCycles(0);
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (sessionRef.current) { clearInterval(sessionRef.current); sessionRef.current = null; }
   }, []);
 
   useEffect(() => {
@@ -89,13 +95,25 @@ export default function BreathingPage() {
           <div className="p-4">
             <label className="text-xs text-text-tertiary mb-3 block">Pattern</label>
             <div className="flex flex-wrap gap-2">
-              {PATTERNS.map((p) => (
+              {[...PATTERNS, { name: 'Custom', ...custom }].map((p) => (
                 <button key={p.name} onClick={() => { if (!running) setPattern(p); }}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
                     pattern.name === p.name ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'
                   }`}>{p.name}</button>
               ))}
             </div>
+            {pattern.name === 'Custom' && (
+              <div className="grid grid-cols-4 gap-2 mt-3">
+                {['inhale', 'hold', 'exhale', 'rest'].map((k) => (
+                  <div key={k}>
+                    <label className="text-[10px] text-text-tertiary mb-1 block capitalize">{k}</label>
+                    <input type="number" min={0} max={20} value={custom[k]}
+                      onChange={(e) => { const v = parseInt(e.target.value) || 0; setCustom((c) => ({ ...c, [k]: v })); setPattern((p) => ({ ...p, [k]: v, name: 'Custom' })); }}
+                      className="w-full bg-surface rounded-lg px-2 py-1.5 text-xs text-text border border-border focus:border-primary focus:outline-none" />
+                  </div>
+                ))}
+              </div>
+            )}
             <p className="text-xs text-text-tertiary mt-4">
               Inhale {pattern.inhale}s {pattern.hold > 0 ? `| Hold ${pattern.hold}s ` : ''}| Exhale {pattern.exhale}s{pattern.rest > 0 ? ` | Rest ${pattern.rest}s` : ''}
             </p>
@@ -107,8 +125,11 @@ export default function BreathingPage() {
                 {running ? 'STOP' : 'START'}
               </button>
             </div>
-            {running && cycles > 0 && (
-              <p className="text-xs text-text-tertiary text-center mt-4">Cycles completed: {cycles}</p>
+            {running && (
+              <div className="text-center mt-4 space-y-1">
+                <p className="text-xs text-text-tertiary">Cycles completed: {cycles}</p>
+                <p className="text-xs text-text-tertiary">Session: {String(Math.floor(sessionSec / 60)).padStart(2, '0')}:{String(sessionSec % 60).padStart(2, '0')}</p>
+              </div>
             )}
           </div>
         </GlassCard>

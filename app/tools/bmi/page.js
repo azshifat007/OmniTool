@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 function bmr(m, cm, age, sex) {
@@ -36,6 +37,13 @@ export default function BmiPage() {
   const bmiVal = m / ((cm / 100) * (cm / 100));
   const cat = getCategory(bmiVal);
   const bmrVal = bmr(m, cm, age, sex);
+
+  const idealLow = 18.5 * ((cm / 100) * (cm / 100));
+  const idealHigh = 24.9 * ((cm / 100) * (cm / 100));
+  const idealLowDisp = unit === 'metric' ? idealLow.toFixed(1) : (idealLow / 0.453592).toFixed(1);
+  const idealHighDisp = unit === 'metric' ? idealHigh.toFixed(1) : (idealHigh / 0.453592).toFixed(1);
+  const tdee = Math.round(bmrVal * 1.55);
+  const summary = `${bmiVal.toFixed(1)} ${cat?.label} · Ideal ${unit === 'metric' ? 'kg' : 'lb'}: ${idealLowDisp}–${idealHighDisp}`;
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -107,12 +115,25 @@ export default function BmiPage() {
             </div>
           </GlassCard>
 
-          <GlassCard>
+           <GlassCard>
             <div className="p-4">
-              <span className="text-xs text-text-tertiary mb-3 block">Estimated BMR</span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-text-tertiary">Estimated BMR & TDEE</span>
+                <CopyButton text={summary} className="text-xs" />
+              </div>
               <div className="text-lg font-mono font-bold text-text">{Math.round(bmrVal)} kcal/day</div>
               <div className="text-[10px] text-text-secondary mt-1">
                 {sex === 'male' ? 'Mifflin-St Jeor for males' : 'Mifflin-St Jeor for females'}
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="bg-surface rounded-lg px-3 py-2 border border-border/50">
+                  <div className="text-[10px] text-text-tertiary">TDEE (moderate)</div>
+                  <div className="text-sm font-mono font-bold text-text">{tdee} kcal</div>
+                </div>
+                <div className="bg-surface rounded-lg px-3 py-2 border border-border/50">
+                  <div className="text-[10px] text-text-tertiary">Healthy weight</div>
+                  <div className="text-sm font-mono font-bold text-text">{idealLowDisp}–{idealHighDisp}</div>
+                </div>
               </div>
             </div>
           </GlassCard>

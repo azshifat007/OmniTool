@@ -27,6 +27,7 @@ export default function BoxModelPage() {
   const [borderColor, setBorderColor] = useState('#cbd5e1');
   const [activeTab, setActiveTab] = useState('margin');
   const [showGuides, setShowGuides] = useState(true);
+  const [boxSizing, setBoxSizing] = useState('content-box');
 
   const update = (obj, setter, key, val) => {
     const n = parseInt(val) || 0;
@@ -37,8 +38,14 @@ export default function BoxModelPage() {
   const borderCss = cssBoxValue(border);
   const paddingCss = cssBoxValue(padding);
 
-  const totalW = margin.left + border.left + padding.left + contentW + padding.right + border.right + margin.right;
-  const totalH = margin.top + border.top + padding.top + contentH + padding.bottom + border.bottom + margin.bottom;
+  const contentBoxW = margin.left + border.left + padding.left + contentW + padding.right + border.right + margin.right;
+  const contentBoxH = margin.top + border.top + padding.top + contentH + padding.bottom + border.bottom + margin.bottom;
+  const totalW = boxSizing === 'border-box'
+    ? margin.left + contentW + margin.right
+    : contentBoxW;
+  const totalH = boxSizing === 'border-box'
+    ? margin.top + contentH + margin.bottom
+    : contentBoxH;
 
   // SVG drawing offsets
   let y = 0;
@@ -121,6 +128,16 @@ export default function BoxModelPage() {
                 className="w-4 h-4 rounded border-border bg-surface accent-primary" />
               <span className="text-xs text-text-secondary">Show dimension guides</span>
             </label>
+
+            <div>
+              <label className="text-xs text-text-tertiary mb-2 block">Box Sizing</label>
+              <div className="flex gap-2">
+                {['content-box', 'border-box'].map((b) => (
+                  <button key={b} onClick={() => setBoxSizing(b)}
+                    className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${boxSizing === b ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'}`}>{b}</button>
+                ))}
+              </div>
+            </div>
           </div>
         </GlassCard>
 
@@ -160,7 +177,7 @@ padding: ${paddingCss || '0px'};
 border: ${Math.max(border.top, border.right, border.bottom, border.left)}px solid ${borderColor};
 width: ${contentW}px;
 height: ${contentH}px;
-box-sizing: content-box;`}
+box-sizing: ${boxSizing};`}
           </pre>
         </div>
       </GlassCard>

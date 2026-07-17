@@ -37,6 +37,14 @@ export default function BwConvertPage() {
 
   const result = convert();
 
+  const allResults = UNITS.map(u => {
+    const fromUnit = UNITS.find(x => x.label === from);
+    const v = parseFloat(value);
+    const bps = isNaN(v) ? 0 : v * fromUnit.toBps;
+    const r = bps / u.toBps;
+    return { label: u.label, val: isNaN(v) || v < 0 ? '--' : r < 0.001 ? '< 0.001' : r.toLocaleString(undefined, { maximumFractionDigits: 4 }) };
+  });
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -61,16 +69,33 @@ export default function BwConvertPage() {
             </div>
             <div>
               <label className="text-xs text-text-tertiary mb-1 block">To</label>
-              <select value={to} onChange={(e) => setTo(e.target.value)}
-                className="w-full bg-surface rounded-lg px-2 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors">
-                {UNITS.map(u => <option key={u.label}>{u.label}</option>)}
-              </select>
+              <div className="flex gap-2">
+                <select value={to} onChange={(e) => setTo(e.target.value)}
+                  className="flex-1 bg-surface rounded-lg px-2 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors">
+                  {UNITS.map(u => <option key={u.label}>{u.label}</option>)}
+                </select>
+                <button onClick={() => { setFrom(to); setTo(from); }}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">⇅</button>
+              </div>
             </div>
           </div>
           <div className="text-center pt-4">
             <div className="text-3xl font-bold font-heading text-text">{result} <span className="text-lg text-text-secondary font-normal">{to}</span></div>
             <div className="text-xs text-text-tertiary mt-1">{value} {from}</div>
             <div className="flex justify-center mt-3"><CopyButton text={String(result)} className="text-xs" /></div>
+          </div>
+        </div>
+      </GlassCard>
+      <GlassCard className="mt-5">
+        <div className="p-4">
+          <span className="text-xs text-text-tertiary mb-3 block">All Conversions</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {allResults.map(r => (
+              <div key={r.label} className={`bg-surface rounded-lg px-3 py-2 border ${r.label === to ? 'border-primary/40' : 'border-border/50'}`}>
+                <div className="text-[10px] text-text-tertiary">{r.label}</div>
+                <div className="text-xs font-mono font-bold text-text truncate">{r.val}</div>
+              </div>
+            ))}
           </div>
         </div>
       </GlassCard>
