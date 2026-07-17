@@ -6,36 +6,58 @@ import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
-function textToBinary(str) {
-  return Array.from(str).map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+function textToRadix(str, radix, pad) {
+  return Array.from(str).map(c => c.charCodeAt(0).toString(radix).padStart(pad, '0')).join(' ');
 }
 
-function binaryToText(bin) {
-  const cleaned = bin.replace(/\s+/g, '');
-  if (!/^[01]*$/.test(cleaned) || cleaned.length % 8 !== 0) return null;
+function radixToText(txt, radix, pad) {
+  const cleaned = txt.replace(/\s+/g, '');
+  if (!new RegExp(`^[0-${radix > 10 ? '9a-f' : radix - 1}]*$`, 'i').test(cleaned) || cleaned.length % pad !== 0) return null;
   let out = '';
-  for (let i = 0; i < cleaned.length; i += 8) {
-    out += String.fromCharCode(parseInt(cleaned.slice(i, i + 8), 2));
+  for (let i = 0; i < cleaned.length; i += pad) {
+    out += String.fromCharCode(parseInt(cleaned.slice(i, i + pad), radix));
   }
   return out;
+}
+
+function textToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function base64ToText(str) {
+  try {
+    return decodeURIComponent(escape(atob(str.trim())));
+  } catch {
+    return null;
+  }
 }
 
 export default function BinaryEncoderPage() {
   const { addEntry } = useHistory();
   const [input, setInput] = useState('Hello!');
   const [output, setOutput] = useState('');
-  const [mode, setMode] = useState('encode');
+  const [mode, setMode] = useState('bin');
   const [error, setError] = useState('');
 
   const convert = useCallback(() => {
     setError('');
     addEntry('Binary Encoder');
-    if (mode === 'encode') {
-      setOutput(textToBinary(input));
+    if (mode === 'text') {
+      if (input.trim() === '') { setError('Enter encoded text to decode.'); setOutput(''); return; }
+      if (input.includes(' ')) {
+        const result = radixToText(input, 2, 8);
+        if (result === null) { setError('Invalid binary input.'); setOutput(''); return; }
+        setOutput(result);
+      } else {
+        const result = base64ToText(input);
+        if (result === null) { setError('Invalid Base64 input.'); setOutput(''); return; }
+        setOutput(result);
+      }
     } else {
-      const result = binaryToText(input);
-      if (result === null) { setError('Invalid binary input. Must be 8-bit binary groups.'); setOutput(''); return; }
-      setOutput(result);
+      if (mode === 'bin') setOutput(textToRadix(input, 2, 8));
+      else if (mode === 'hex') setOutput(textToRadix(input, 16, 2));
+      else if (mode === 'oct') setOutput(textToRadix(input, 8, 3));
+      else if (mode === 'b64') setOutput(textToBase64(input));
     }
   }, [input, mode, addEntry]);
 
@@ -53,11 +75,17 @@ export default function BinaryEncoderPage() {
               <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={4}
                 className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors resize-none" />
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMode('encode')}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${mode === 'encode' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border'}`}>Text → Binary</button>
-              <button onClick={() => setMode('decode')}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${mode === 'decode' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border'}`}>Binary → Text</button>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { k: 'bin', l: 'Text → Binary' },
+                { k: 'hex', l: 'Text → Hex' },
+                { k: 'oct', l: 'Text → Octal' },
+                { k: 'b64', l: 'Text → Base64' },
+                { k: 'text', l: 'Decode' },
+              ].map(o => (
+                <button key={o.k} onClick={() => setMode(o.k)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${mode === o.k ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border'}`}>{o.l}</button>
+              ))}
             </div>
             <button onClick={convert} className="w-full px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Convert</button>
             {error && <div className="text-cat-text text-xs bg-cat-text/10 rounded-lg px-3 py-2 border border-cat-text/20">{error}</div>}

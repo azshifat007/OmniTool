@@ -6,10 +6,15 @@ import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
-async function sha256(text) {
+async function hashText(text, algo, useHmac, key) {
   const encoder = new TextEncoder();
+  if (useHmac && key) {
+    const cryptoKey = await crypto.subtle.importKey('raw', encoder.encode(key), { name: 'HMAC', hash: algo }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(text));
+    return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
   const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest(algo, data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -19,6 +24,8 @@ export default function BcryptPage() {
   const [password, setPassword] = useState('');
   const [salt, setSalt] = useState('');
   const [verifyHash, setVerifyHash] = useState('');
+  const [algo, setAlgo] = useState('SHA-256');
+  const [useHmac, setUseHmac] = useState(false);
   const [hash, setHash] = useState('');
   const [match, setMatch] = useState(null);
   const [error, setError] = useState('');
@@ -27,25 +34,25 @@ export default function BcryptPage() {
     setError('');
     if (!password.trim()) { setError('Enter a password.'); return; }
     try {
-      const result = await sha256(salt + password);
+      const result = await hashText(salt + password, algo, useHmac, salt);
       setHash(result);
       addEntry('SHA Hash Verifier');
     } catch (e) {
       setError(e.message);
     }
-  }, [password, salt, addEntry]);
+  }, [password, salt, algo, useHmac, addEntry]);
 
   const handleVerify = useCallback(async () => {
     setError('');
     if (!password.trim() || !verifyHash.trim()) { setError('Enter both password and hash to verify.'); return; }
     try {
-      const result = await sha256(salt + password);
+      const result = await hashText(salt + password, algo, useHmac, salt);
       setMatch(result.toLowerCase() === verifyHash.trim().toLowerCase());
       addEntry('SHA Hash Verifier');
     } catch (e) {
       setError(e.message);
     }
-  }, [password, salt, verifyHash, addEntry]);
+  }, [password, salt, verifyHash, algo, useHmac, addEntry]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -63,9 +70,24 @@ export default function BcryptPage() {
                 className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
             </div>
             <div>
-              <label className="text-xs text-text-tertiary mb-2 block">Salt (optional, prepended)</label>
+              <label className="text-xs text-text-tertiary mb-2 block">Salt / HMAC Key (optional, prepended)</label>
               <input value={salt} onChange={(e) => setSalt(e.target.value)} placeholder="e.g. random_salt"
                 className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs text-text-tertiary mb-1 block">Algorithm</label>
+                <select value={algo} onChange={(e) => setAlgo(e.target.value)}
+                  className="w-full bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                  {['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'].map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button onClick={() => setUseHmac(v => !v)}
+                  className={`w-full px-3 py-2 text-xs font-medium rounded-lg border transition-all cursor-pointer ${useHmac ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border'}`}>
+                  HMAC {useHmac ? 'On' : 'Off'}
+                </button>
+              </div>
             </div>
             <div>
               <label className="text-xs text-text-tertiary mb-2 block">Existing Hash (to verify against)</label>

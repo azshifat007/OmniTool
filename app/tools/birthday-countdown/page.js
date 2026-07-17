@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import { useHistory } from '@/components/HistoryProvider';
@@ -48,8 +48,13 @@ export default function BirthdayCountdownPage() {
   const [month, setMonth] = useState('6');
   const [year, setYear] = useState('1990');
 
-  const now = useMemo(() => new Date(), []);
-  const today = useMemo(() => ({ m: now.getMonth() + 1, d: now.getDate(), y: now.getFullYear() }), []);
+  const [now, setNow] = useState(() => new Date());
+  const today = useMemo(() => ({ m: now.getMonth() + 1, d: now.getDate(), y: now.getFullYear() }), [now]);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const info = useMemo(() => {
     const d = parseInt(day); const m = parseInt(month); const y = parseInt(year);
@@ -65,11 +70,15 @@ export default function BirthdayCountdownPage() {
     const zodiac = getZodiac(m, d);
     const chinese = getChineseZodiac(y);
     const totalDays = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
+    const lastBirthday = new Date(nextBirthday);
+    lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+    const daysSince = Math.max(0, Math.floor((now - lastBirthday) / (1000 * 60 * 60 * 24)));
     const isToday = d === today.d && m === today.m;
     const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][birthDate.getDay()];
     const nextDow = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][nextBirthday.getDay()];
+    const nextDateStr = nextBirthday.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     addEntry('Birthday Countdown');
-    return { age, daysLeft, hoursLeft, minsLeft, zodiac, chinese, totalDays, isToday, dayOfWeek, nextDow, nextBirthday };
+    return { age, daysLeft, hoursLeft, minsLeft, zodiac, chinese, totalDays, daysSince, isToday, dayOfWeek, nextDow, nextBirthday, nextDateStr };
   }, [day, month, year, now, today, addEntry]);
 
   return (
@@ -140,8 +149,9 @@ export default function BirthdayCountdownPage() {
                   {[
                     { label: 'Age', value: `${info.age} years` },
                     { label: 'Born on', value: `${info.dayOfWeek}` },
-                    { label: 'Next birthday', value: info.nextDow },
+                    { label: 'Next birthday', value: info.nextDateStr },
                     { label: 'Days on Earth', value: info.totalDays.toLocaleString() },
+                    { label: 'Days since last', value: info.daysSince.toLocaleString() },
                     { label: 'Zodiac', value: `${info.zodiac.emoji} ${info.zodiac.name}` },
                     { label: 'Chinese Zodiac', value: info.chinese },
                   ].map(({ label, value }) => (

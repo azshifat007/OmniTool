@@ -15,16 +15,22 @@ function fmt(seconds) {
 export default function BatteryPage() {
   const [info, setInfo] = useState(null);
   const [supported, setSupported] = useState(true);
+  const [updated, setUpdated] = useState(null);
 
   useEffect(() => {
     if (!navigator.getBattery) { setSupported(false); return; }
+    let batteryObj = null;
     navigator.getBattery().then(battery => {
-      const update = () => setInfo({
-        level: Math.round(battery.level * 100),
-        charging: battery.charging,
-        chargingTime: battery.chargingTime,
-        dischargingTime: battery.dischargingTime,
-      });
+      batteryObj = battery;
+      const update = () => {
+        setInfo({
+          level: Math.round(battery.level * 100),
+          charging: battery.charging,
+          chargingTime: battery.chargingTime,
+          dischargingTime: battery.dischargingTime,
+        });
+        setUpdated(new Date());
+      };
       update();
       battery.addEventListener('levelchange', update);
       battery.addEventListener('chargingchange', update);
@@ -86,6 +92,9 @@ export default function BatteryPage() {
           <div className="w-full bg-surface rounded-full h-4 overflow-hidden border border-border">
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${info.level}%`, backgroundColor: chargeColor }} />
           </div>
+          {updated && (
+            <div className="text-center text-[10px] text-text-tertiary">Updated {updated.toLocaleTimeString()}</div>
+          )}
           <div className="grid grid-cols-2 gap-4 text-sm">
             {[
               ['Status', info.charging ? 'Charging' : 'Discharging'],
