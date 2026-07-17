@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -10,6 +10,8 @@ export default function CookieViewerPage() {
   const { addEntry } = useHistory();
   const [cookies, setCookies] = useState([]);
   const [search, setSearch] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newValue, setNewValue] = useState('');
   const [copied, setCopied] = useState(false);
 
   const parseCookies = useCallback(() => {
@@ -33,7 +35,25 @@ export default function CookieViewerPage() {
     setCookies([]);
   }, []);
 
+  const addCookie = useCallback(() => {
+    if (!newName.trim()) return;
+    document.cookie = `${newName.trim()}=${encodeURIComponent(newValue)}; path=/; max-age=31536000`;
+    setNewName(''); setNewValue('');
+    parseCookies();
+  }, [newName, newValue, parseCookies]);
+
+  const copyAll = useCallback(async () => {
+    const text = cookies.map(c => `${c.name}=${c.value}`).join('; ');
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [cookies]);
+
   const filtered = search ? cookies.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.value.toLowerCase().includes(search.toLowerCase())) : cookies;
+
+  useEffect(() => {
+    parseCookies();
+  }, [parseCookies]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -44,12 +64,22 @@ export default function CookieViewerPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <GlassCard>
           <div className="p-4 space-y-4">
-            <p className="text-sm text-text-secondary">View, search, and clear cookies set by this site in your browser.</p>
+            <p className="text-sm text-text-secondary">View, search, add, and clear cookies set by this site in your browser.</p>
             <div className="flex gap-2">
-              <button onClick={parseCookies} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Load Cookies</button>
+              <button onClick={parseCookies} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Reload</button>
               {cookies.length > 0 && (
                 <button onClick={clearAll} className="px-4 py-1.5 text-xs font-medium rounded-lg bg-cat-text/10 text-cat-text hover:bg-cat-text/20 transition-all cursor-pointer">Clear All</button>
               )}
+            </div>
+            <div className="bg-surface rounded-lg p-3 border border-border/50 space-y-2">
+              <div className="text-xs text-text-tertiary">Add Cookie</div>
+              <div className="flex gap-2">
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="name"
+                  className="flex-1 bg-surface rounded-lg px-2 py-1.5 text-xs text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+                <input value={newValue} onChange={(e) => setNewValue(e.target.value)} placeholder="value"
+                  className="flex-1 bg-surface rounded-lg px-2 py-1.5 text-xs text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+                <button onClick={addCookie} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">Add</button>
+              </div>
             </div>
             {cookies.length > 0 && (
               <div>
@@ -60,9 +90,16 @@ export default function CookieViewerPage() {
             )}
           </div>
         </GlassCard>
-        <GlassCard>
-          <div className="p-4">
-            <span className="text-xs text-text-tertiary mb-3 block">Cookies ({filtered.length})</span>
+          <GlassCard>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-text-tertiary">Cookies ({filtered.length})</span>
+                {cookies.length > 0 && (
+                  <button onClick={copyAll} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">
+                    {copied ? 'Copied!' : 'Copy All'}
+                  </button>
+                )}
+              </div>
             {filtered.length === 0 ? (
               <div className="text-text-tertiary text-sm">{cookies.length === 0 ? 'Click "Load Cookies" to view cookies for this site.' : 'No matching cookies.'}</div>
             ) : (

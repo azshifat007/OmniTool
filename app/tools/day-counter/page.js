@@ -1,19 +1,19 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 export default function DayCounterPage() {
   const { addEntry } = useHistory();
   const [start, setStart] = useState('2024-01-01');
   const [end, setEnd] = useState(new Date().toISOString().split('T')[0]);
-  const [result, setResult] = useState(null);
 
-  const calc = useCallback(() => {
+  const result = useMemo(() => {
+    if (!start || !end) return null;
     addEntry('Day Counter');
-    if (!start || !end) return;
     const s = new Date(start);
     const e = new Date(end);
     const diff = Math.abs(e - s);
@@ -25,7 +25,7 @@ export default function DayCounterPage() {
       const d = new Date(s.getTime() + i * 86400000);
       return d.getDay();
     }).filter(d => d !== 0 && d !== 6).length;
-    setResult({
+    return {
       days,
       weeks: Math.round(weeks * 10) / 10,
       months: Math.abs(months),
@@ -34,8 +34,19 @@ export default function DayCounterPage() {
       weekends: days + 1 - weekdays,
       hours: days * 24,
       minutes: days * 1440,
-    });
+    };
   }, [start, end, addEntry]);
+
+  const summary = result ? [
+    ['Days', result.days],
+    ['Weeks', result.weeks],
+    ['Months', result.months],
+    ['Years', result.years],
+    ['Weekdays', result.weekdays],
+    ['Weekends', result.weekends],
+    ['Hours', result.hours.toLocaleString()],
+    ['Minutes', result.minutes.toLocaleString()],
+  ].map(([l, v]) => `${l}: ${v}`).join('\n') : '';
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -57,7 +68,10 @@ export default function DayCounterPage() {
                 className="w-full bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors" />
             </div>
           </div>
-          <button onClick={calc} className="w-full px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Calculate</button>
+          <div className="flex gap-2">
+            <button onClick={() => { setStart(end); setEnd(start); }} className="flex-1 px-4 py-2 text-sm font-semibold rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">Swap</button>
+            {result && <CopyButton text={summary} className="text-xs" />}
+          </div>
           {result && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
               <div className="text-center text-4xl font-bold font-heading text-text py-2">{result.days} <span className="text-lg text-text-secondary font-normal">days</span></div>

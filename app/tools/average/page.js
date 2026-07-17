@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import GlassCard from '@/components/GlassCard'
 import CopyButton from '@/components/CopyButton'
@@ -9,14 +9,11 @@ import { useHistory } from '@/components/HistoryProvider'
 export default function AveragePage() {
   const { addEntry } = useHistory()
   const [input, setInput] = useState('23, 45, 67, 12, 89, 34, 55')
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState('')
   const [history, setHistory] = useState([])
 
-  const calculate = useCallback(() => {
-    setError('')
+  const { result, error } = useMemo(() => {
     const nums = input.split(/[,\s]+/).map(s => parseFloat(s.trim())).filter(n => !isNaN(n))
-    if (nums.length < 2) { setError('Enter at least 2 numbers separated by commas.'); setResult(null); return }
+    if (nums.length < 2) return { result: null, error: 'Enter at least 2 numbers separated by commas.' }
 
     const sorted = [...nums].sort((a, b) => a - b)
     const sum = nums.reduce((a, b) => a + b, 0)
@@ -55,9 +52,9 @@ export default function AveragePage() {
       populationVariance, sampleVariance, populationStd: stdDev, sampleStd: sampleStdDev,
       q1, q3, iqr, mad, sorted: sorted.join(', '), freqBars, maxFreq: maxVal
     }
-    setResult(res)
     addEntry('Average Calculator')
     setHistory(h => [{ count: nums.length, mean: mean.toFixed(2), input: input.slice(0, 40), time: new Date().toLocaleTimeString() }, ...h].slice(0, 15))
+    return { result: res, error: '' }
   }, [input, addEntry])
 
   return (
@@ -73,7 +70,15 @@ export default function AveragePage() {
             <textarea value={input} onChange={e => setInput(e.target.value)} rows={3}
               className="w-full bg-surface rounded-lg px-3 py-2 text-sm font-mono text-text border border-border focus:border-primary focus:outline-none transition-colors resize-none" />
           </div>
-          <button onClick={calculate} className="w-full px-4 py-2.5 text-sm font-medium rounded-xl bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Calculate</button>
+          {result && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-text-tertiary">{result.count} values</span>
+              <CopyButton text={[
+                `Count: ${result.count}`, `Sum: ${result.sum}`, `Mean: ${result.mean.toFixed(4)}`,
+                `Median: ${result.median.toFixed(4)}`, `Min: ${result.min}`, `Max: ${result.max}`, `Range: ${result.range}`
+              ].join('\n')} className="text-xs" />
+            </div>
+          )}
 
           {result && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5">

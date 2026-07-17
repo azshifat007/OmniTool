@@ -33,8 +33,24 @@ export default function CiBadgePage() {
     setLeft(p.left);
     setRight(p.right);
     setColor(p.color);
+    setLogo(p.logo || '');
     addEntry('CI Badge Generator');
   }, [addEntry]);
+
+  const allFormats = `Markdown:\n${md}\n\nHTML:\n${html}\n\nURL:\n${badgeUrl}`;
+
+  const QUICK_COLORS = [
+    { name: 'brightgreen', hex: '#4c1' },
+    { name: 'green', hex: '#97ca00' },
+    { name: 'yellow', hex: '#dfb317' },
+    { name: 'orange', hex: '#fe7d37' },
+    { name: 'red', hex: '#e05d44' },
+    { name: 'blue', hex: '#007ec6' },
+    { name: 'blueviolet', hex: '#8a2be2' },
+    { name: 'lightgrey', hex: '#9f9f9f' },
+    { name: 'informational', hex: '#007ec6' },
+    { name: '#a259ff', hex: '#a259ff' },
+  ];
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -71,6 +87,14 @@ export default function CiBadgePage() {
                 <label className="text-xs text-text-tertiary mb-1 block">Color</label>
                 <input value={color} onChange={(e) => setColor(e.target.value)}
                   className="w-full bg-surface rounded-lg px-3 py-2 text-sm text-text border border-border focus:border-primary focus:outline-none transition-colors" />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {QUICK_COLORS.map(c => (
+                    <button key={c.name} onClick={() => setColor(c.name)}
+                      className={`w-6 h-6 rounded-md border-2 transition-all cursor-pointer ${color === c.name ? 'border-primary' : 'border-border'}`}
+                      style={{ background: c.hex }}
+                      title={c.name} />
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="text-xs text-text-tertiary mb-1 block">Style</label>
@@ -89,12 +113,15 @@ export default function CiBadgePage() {
             </div>
           </div>
         </GlassCard>
-        <GlassCard>
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-center bg-surface rounded-xl p-4 border border-border/50 min-h-[60px]">
-              <img src={badgeUrl} alt="badge" className="max-w-full" onError={(e) => { e.target.style.display = 'none'; }} />
-            </div>
-            <div>
+          <GlassCard>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-center bg-surface rounded-xl p-4 border border-border/50 min-h-[60px]">
+                <img src={badgeUrl} alt="badge" className="max-w-full" onError={(e) => { e.target.style.display = 'none'; }} />
+              </div>
+              <div className="flex justify-center">
+                <CopyButton text={allFormats} className="text-xs" />
+              </div>
+              <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-text-tertiary">Markdown</span>
                 <CopyButton text={md} className="text-xs" />
