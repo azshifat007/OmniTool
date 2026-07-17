@@ -33,6 +33,8 @@ export default function CalculatorPage() {
   const [expression, setExpression] = useState('');
   const [history, setHistory] = useState([]);
   const [justEvaluated, setJustEvaluated] = useState(false);
+  const [memory, setMemory] = useState(0);
+  const [memSet, setMemSet] = useState(false);
 
   const handleButton = useCallback((btn) => {
     switch (btn) {
@@ -106,6 +108,14 @@ export default function CalculatorPage() {
     }
   }, [display, expression, justEvaluated, addEntry]);
 
+  const handleMemory = useCallback((action) => {
+    const val = parseFloat(display) || 0;
+    if (action === 'MC') { setMemory(0); setMemSet(false); }
+    else if (action === 'M+') { setMemory(m => m + val); setMemSet(true); }
+    else if (action === 'M-') { setMemory(m => m - val); setMemSet(true); }
+    else if (action === 'MR') { setDisplay(String(memory)); setExpression(String(memory)); setJustEvaluated(true); }
+  }, [display, memory]);
+
   const handleKeyDown = useCallback((e) => {
     const keyMap = {
       Enter: '=', Backspace: 'C',
@@ -149,12 +159,25 @@ export default function CalculatorPage() {
         <GlassCard>
           <div className="p-4">
             <div className="bg-surface rounded-xl border border-border p-4 mb-4 text-right">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-primary font-mono">{memSet ? `M: ${memory}` : ' '}</span>
+                <button onClick={() => navigator.clipboard.writeText(display)} className="text-[10px] text-text-tertiary hover:text-primary cursor-pointer">Copy</button>
+              </div>
               <div className="text-xs text-text-tertiary font-mono min-h-[1.2em] break-all">
                 {expression || '\u00A0'}
               </div>
               <div className="text-3xl font-mono text-text font-bold mt-1 break-all">
                 {display}
               </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2 mb-2">
+              {['MC', 'M+', 'M-', 'MR'].map((m) => (
+                <button key={m} onClick={() => handleMemory(m)}
+                  className="py-2 rounded-xl text-xs font-medium bg-surface text-cat-math border border-border hover:border-primary/40 transition-all cursor-pointer">
+                  {m}
+                </button>
+              ))}
             </div>
 
             <div className="space-y-2">

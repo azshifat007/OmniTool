@@ -51,17 +51,27 @@ export default function CalConvertPage() {
     const y = parseInt(year) || 2025;
     const m = parseInt(month) || 1;
     const d = parseInt(day) || 1;
+    const date = new Date(y, m - 1, d);
     const jd = toJulian(y, m, d);
-    const dow = new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long' });
-    const doy = Math.ceil((new Date(y, m - 1, d) - new Date(y, 0, 0)) / 86400000);
+    const dow = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const doy = Math.ceil((date - new Date(y, 0, 0)) / 86400000);
+    const unix = Math.floor(date.getTime() / 1000);
+    const isoWeek = (() => {
+      const t = new Date(Date.UTC(y, m - 1, d));
+      const dayNum = (t.getUTCDay() + 6) % 7;
+      t.setUTCDate(t.getUTCDate() - dayNum + 3);
+      const firstThursday = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+      return 1 + Math.round(((t - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
+    })();
     return {
-      jd, dow, doy,
+      jd, dow, doy, unix, isoWeek,
       hebrew: `${hebrewYear(y)}`,
       islamic: `${islamicYear(y)}`,
       chinese: chineseYear(y),
       zodiac: zodiacSign(m, d),
       week: Math.ceil(doy / 7),
       quarter: Math.ceil(m / 3),
+      iso: date.toISOString().slice(0, 10),
     };
   }, [year, month, day]);
 
@@ -96,8 +106,11 @@ export default function CalConvertPage() {
               { label: 'Day of Week', value: info.dow },
               { label: 'Day of Year', value: info.doy },
               { label: 'Week of Year', value: info.week },
+              { label: 'ISO Week', value: info.isoWeek },
               { label: 'Quarter', value: `Q${info.quarter}` },
               { label: 'Julian Day', value: info.jd },
+              { label: 'Unix Timestamp', value: info.unix },
+              { label: 'ISO Date', value: info.iso },
               { label: 'Hebrew Year', value: info.hebrew },
               { label: 'Islamic Year', value: info.islamic },
               { label: 'Chinese Zodiac', value: info.chinese },
@@ -109,7 +122,7 @@ export default function CalConvertPage() {
               </div>
             ))}
           </div>
-          <CopyButton text={`${info.dow}, ${MONTHS[month - 1]} ${day}, ${year} | DOY: ${info.doy} | JD: ${info.jd} | Hebrew: ${info.hebrew} | Chinese: ${info.chinese}`} className="text-xs w-full" />
+          <CopyButton text={`${info.dow}, ${MONTHS[month - 1]} ${day}, ${year} | DOY: ${info.doy} | JD: ${info.jd} | Unix: ${info.unix} | Hebrew: ${info.hebrew} | Chinese: ${info.chinese}`} className="text-xs w-full" />
         </div>
       </GlassCard>
     </motion.div>

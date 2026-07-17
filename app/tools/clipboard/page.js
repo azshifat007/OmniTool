@@ -40,6 +40,22 @@ export default function ClipboardPage() {
     addEntry('Clipboard Manager');
   }, [addEntry]);
 
+  const copyItem = useCallback(async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('Copied!');
+    } catch { setStatus('Copy failed.'); }
+    setTimeout(() => setStatus(''), 1500);
+  }, []);
+
+  const removeItem = useCallback((idx) => {
+    setItems((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      localStorage.setItem('omnitool-clipboard', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const clear = useCallback(() => {
     setItems([]);
     localStorage.removeItem('omnitool-clipboard');
@@ -58,7 +74,7 @@ export default function ClipboardPage() {
         <span className="text-2xl text-cat-system">📋</span>
         <h1 className="font-heading text-2xl font-bold text-text">Clipboard Manager</h1>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <GlassCard>
           <div className="p-4 space-y-3">
             <label className="text-xs text-text-tertiary mb-1 block">Text</label>
@@ -67,6 +83,7 @@ export default function ClipboardPage() {
             <div className="flex gap-2">
               <button onClick={copy} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Copy</button>
               <button onClick={paste} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface border border-border text-text-secondary hover:text-text transition-all cursor-pointer">Paste</button>
+              <span className="ml-auto text-[10px] text-text-tertiary self-center">{current.length} chars · {current.trim() ? current.trim().split(/\s+/).length : 0} words</span>
             </div>
             {status && <div className="text-xs text-cat-success">{status}</div>}
           </div>
@@ -82,9 +99,11 @@ export default function ClipboardPage() {
             ) : (
               <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
                 {items.map((t, i) => (
-                  <div key={i} onClick={() => restore(t)} className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-surface border border-border/50 text-sm cursor-pointer hover:border-primary/30 transition-colors">
+                  <div key={i} className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-surface border border-border/50 text-sm hover:border-primary/30 transition-colors">
                     <span className="text-xs text-text-tertiary shrink-0">{i + 1}.</span>
-                    <span className="truncate text-text">{t}</span>
+                    <span onClick={() => { restore(t); }} className="truncate text-text flex-1 cursor-pointer">{t}</span>
+                    <button onClick={() => copyItem(t)} className="text-[10px] text-text-secondary hover:text-primary cursor-pointer shrink-0" title="Copy">⧉</button>
+                    <button onClick={() => removeItem(i)} className="text-[10px] text-text-secondary hover:text-cat-text cursor-pointer shrink-0" title="Delete">✕</button>
                   </div>
                 ))}
               </div>

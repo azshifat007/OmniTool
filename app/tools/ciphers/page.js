@@ -35,7 +35,7 @@ function vigenere(text, key, decode) {
   });
 }
 
-const ciphers = ['Caesar', 'Atbash', 'ROT13', 'Vigenere'];
+const ciphers = ['Caesar', 'Atbash', 'ROT13', 'Vigenere', 'All'];
 
 export default function CiphersPage() {
   const { addEntry } = useHistory();
@@ -45,16 +45,17 @@ export default function CiphersPage() {
   const [vigenereKey, setVigenereKey] = useState('key');
   const [mode, setMode] = useState('encode');
 
+  const allOutputs = useMemo(() => ({
+    Caesar: caesar(input, shift, mode === 'decode'),
+    Atbash: atbash(input),
+    ROT13: rot13(input),
+    Vigenere: vigenere(input, vigenereKey, mode === 'decode'),
+  }), [input, shift, vigenereKey, mode]);
+
   const output = useMemo(() => {
-    const isDecode = mode === 'decode';
-    switch (cipher) {
-      case 'Caesar': return caesar(input, shift, isDecode);
-      case 'Atbash': return atbash(input);
-      case 'ROT13': return rot13(input);
-      case 'Vigenere': return vigenere(input, vigenereKey, isDecode);
-      default: return input;
-    }
-  }, [cipher, input, shift, vigenereKey, mode]);
+    if (cipher === 'All') return '';
+    return allOutputs[cipher] ?? input;
+  }, [cipher, allOutputs]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -120,10 +121,21 @@ export default function CiphersPage() {
           <GlassCard>
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-text-tertiary">Output</span>
-                <CopyButton text={output} />
+                <span className="text-xs text-text-tertiary">{cipher === 'All' ? 'All Ciphers' : 'Output'}</span>
+                {cipher === 'All' ? <CopyButton text={Object.entries(allOutputs).map(([k, v]) => `${k}: ${v}`).join('\n')} /> : <CopyButton text={output} />}
               </div>
-              <div className="bg-surface rounded-lg p-3 text-sm font-mono text-text border border-border min-h-[120px] break-all">{output || <span className="text-text-tertiary text-xs">Enter text to {mode}</span>}</div>
+              {cipher === 'All' ? (
+                <div className="space-y-3">
+                  {Object.entries(allOutputs).map(([k, v]) => (
+                    <div key={k}>
+                      <div className="text-[10px] text-text-tertiary mb-1">{k}</div>
+                      <div className="bg-surface rounded-lg p-3 text-sm font-mono text-text border border-border break-all">{v || <span className="text-text-tertiary text-xs">—</span>}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-surface rounded-lg p-3 text-sm font-mono text-text border border-border min-h-[120px] break-all">{output || <span className="text-text-tertiary text-xs">Enter text to {mode}</span>}</div>
+              )}
             </div>
           </GlassCard>
 
