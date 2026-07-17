@@ -23,12 +23,13 @@ export default function PdfMergePage() {
       return;
     }
     setError('');
+    addEntry('PDF Merger');
     setFiles((prev) => {
       const existing = new Set(prev.map(f => f.name + f.size));
       const newFiles = droppedFiles.filter(f => !existing.has(f.name + f.size));
       return [...prev, ...newFiles];
     });
-  }, []);
+  }, [addEntry]);
 
   const handleDragOver = (e) => e.preventDefault();
 
@@ -96,7 +97,7 @@ export default function PdfMergePage() {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-2xl text-cat-document">⊞</span>
+        <span className="text-2xl text-cat-pdf">⊞</span>
         <h1 className="font-heading text-2xl font-bold text-text">PDF Merger</h1>
       </div>
 
@@ -121,6 +122,7 @@ export default function PdfMergePage() {
                   );
                   if (selected.length > 0) {
                     setError('');
+                    addEntry('PDF Merger');
                     setFiles((prev) => {
                       const existing = new Set(prev.map(f => f.name + f.size));
                       const newFiles = selected.filter(f => !existing.has(f.name + f.size));
