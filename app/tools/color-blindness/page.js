@@ -68,6 +68,17 @@ export default function ColorBlindnessPage() {
     link.click();
   };
 
+  const simulate = (hex, type) => {
+    const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    const m = MATRICES[type];
+    const nr = Math.max(0, Math.min(255, Math.round(r * m[0] + g * m[1] + b * m[2])));
+    const ng = Math.max(0, Math.min(255, Math.round(r * m[4] + g * m[5] + b * m[6])));
+    const nb = Math.max(0, Math.min(255, Math.round(r * m[8] + g * m[9] + b * m[10])));
+    return `rgb(${nr}, ${ng}, ${nb})`;
+  };
+
+  const SAMPLE = ['#FF0000', '#00FF00', '#0000FF', '#FF8800', '#8800FF', '#00FF88', '#FF0088', '#88FF00'];
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -125,6 +136,24 @@ export default function ColorBlindnessPage() {
           </GlassCard>
         </div>
       )}
+
+      <GlassCard className="mt-5">
+        <div className="p-4">
+          <div className="text-xs text-text-tertiary mb-3">Quick Preview (no upload needed)</div>
+          <div className="space-y-2">
+            {Object.entries(LABELS).map(([k, v]) => (
+              <div key={k}>
+                <div className="text-[10px] text-text-tertiary mb-1">{v}</div>
+                <div className="flex gap-1">
+                  {SAMPLE.map(hex => (
+                    <div key={hex} className="flex-1 h-8 rounded border border-border" style={{ backgroundColor: k === 'normal' ? hex : simulate(hex, k) }} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }

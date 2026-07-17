@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import { useHistory } from '@/components/HistoryProvider';
@@ -12,6 +12,8 @@ function randomColor() {
   return { r, g, b, hex: '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('') };
 }
 
+const DIFFICULTY = { Easy: 4, Medium: 6, Hard: 8 };
+
 export default function ColorGuessPage() {
   const { addEntry } = useHistory();
   const [target, setTarget] = useState(() => randomColor());
@@ -19,11 +21,19 @@ export default function ColorGuessPage() {
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [options, setOptions] = useState([]);
+  const [difficulty, setDifficulty] = useState('Medium');
+  const [best, setBest] = useState(0);
+
+  useEffect(() => {
+    const saved = parseInt(localStorage.getItem('omnitool-colorguess-best') || '0');
+    if (!isNaN(saved)) setBest(saved);
+  }, []);
 
   const newRound = useCallback(() => {
     const t = randomColor();
+    const count = DIFFICULTY[difficulty];
     const opts = [t.hex];
-    while (opts.length < 6) {
+    while (opts.length < count) {
       const h = randomColor().hex;
       if (!opts.includes(h)) opts.push(h);
     }
@@ -31,7 +41,7 @@ export default function ColorGuessPage() {
     setTarget(t);
     setOptions(opts);
     setFeedback('');
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => { newRound(); }, [newRound]);
 
@@ -40,12 +50,18 @@ export default function ColorGuessPage() {
     if (feedback) return;
     setTotal(t => t + 1);
     if (hex === target.hex) {
-      setScore(s => s + 1);
+      setScore(s => {
+        const ns = s + 1;
+        if (ns > best) { setBest(ns); localStorage.setItem('omnitool-colorguess-best', String(ns)); }
+        return ns;
+      });
       setFeedback('Correct! 🎉');
     } else {
       setFeedback(`Wrong! It was ${target.hex}`);
     }
-  }, [feedback, target, addEntry]);
+  }, [feedback, target, addEntry, best]);
+
+  const accuracy = useMemo(() => total ? Math.round(score / total * 100) : 0, [score, total]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -57,6 +73,14 @@ export default function ColorGuessPage() {
         <div className="p-4 max-w-md mx-auto space-y-4 text-center">
           <div className="flex items-center justify-center gap-4">
             <span className="text-sm text-text-tertiary">Score: <span className="text-text font-semibold">{score}/{total}</span></span>
+            <span className="text-sm text-text-tertiary">Best: <span className="text-text font-semibold">{best}</span></span>
+            <span className="text-sm text-text-tertiary">Acc: <span className="text-text font-semibold">{accuracy}%</span></span>
+          </div>
+          <div className="flex justify-center gap-2">
+            {Object.keys(DIFFICULTY).map(d => (
+              <button key={d} onClick={() => { setDifficulty(d); setScore(0); setTotal(0); setFeedback(''); }} disabled={!!feedback}
+                className={`px-3 py-1 text-xs rounded-lg ${difficulty === d ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'} transition-all cursor-pointer disabled:opacity-50`}>{d}</button>
+            ))}
           </div>
           <div className="w-40 h-40 mx-auto rounded-2xl border-2 border-border shadow-lg" style={{ backgroundColor: target.hex }} />
           <p className="text-sm text-text-secondary">Which hex code matches this color?</p>

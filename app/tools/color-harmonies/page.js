@@ -44,7 +44,9 @@ function harmonies(h, s, l) {
   return {
     Complementary: [m(h + 180)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
     Triadic: [m(h + 120), m(h + 240)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
-    Tetradic: [m(h + 0), m(h + 90), m(h + 180), m(h + 270)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
+    'Split-Complementary': [m(h + 150), m(h + 210)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
+    Tetradic: [m(h + 0), m(h + 60), m(h + 180), m(h + 240)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
+    Square: [m(h + 0), m(h + 90), m(h + 180), m(h + 270)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
     Analogous: [m(h - 30), m(h), m(h + 30)].map(hh => rgbToHex(...hslToRgb(hh, s, l))),
     Monochromatic: [20, 40, 60, 80].map(ll => rgbToHex(...hslToRgb(h, s, ll))),
   };

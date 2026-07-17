@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 
@@ -40,16 +40,53 @@ function luminance(hex) {
   return 0.2126 * (r <= 0.03928 ? r/12.92 : Math.pow((r+0.055)/1.055, 2.4)) + 0.7152 * (g <= 0.03928 ? g/12.92 : Math.pow((g+0.055)/1.055, 2.4)) + 0.0722 * (b <= 0.03928 ? b/12.92 : Math.pow((b+0.055)/1.055, 2.4));
 }
 
+function hue(hex) {
+  const r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+  const mx = Math.max(r,g,b), mn = Math.min(r,g,b);
+  let h = 0;
+  if (mx !== mn) {
+    const d = mx - mn;
+    if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (mx === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  return h;
+}
+
 async function copy(text) { try { await navigator.clipboard.writeText(text); } catch {} }
+
+function hexToRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+}
 
 export default function ColorNamesPage() {
   const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('name');
+  const [closest, setClosest] = useState('');
+  const [match, setMatch] = useState(null);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return COLORS;
-    const q = query.toLowerCase();
-    return COLORS.filter(([name]) => name.toLowerCase().includes(q));
-  }, [query]);
+    let list = COLORS;
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      list = list.filter(([name]) => name.toLowerCase().includes(q));
+    }
+    if (sort === 'hue') list = [...list].sort((a, b) => hue(a[1]) - hue(b[1]));
+    return list;
+  }, [query, sort]);
+
+  const findClosest = useCallback(() => {
+    const c = closest.trim();
+    if (!/^#[0-9a-f]{6}$/i.test(c)) { setMatch(null); return; }
+    const [tr, tg, tb] = hexToRgb(c);
+    let best = null, bestD = Infinity;
+    for (const [name, hex] of COLORS) {
+      const [r, g, b] = hexToRgb(hex);
+      const d = (r - tr) ** 2 + (g - tg) ** 2 + (b - tb) ** 2;
+      if (d < bestD) { bestD = d; best = [name, hex]; }
+    }
+    setMatch(best);
+  }, [closest]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -58,10 +95,29 @@ export default function ColorNamesPage() {
         <h1 className="font-heading text-2xl font-bold text-text">CSS Color Names</h1>
       </div>
       <GlassCard>
-        <div className="p-4">
+        <div className="p-4 space-y-3">
           <input type="text" value={query} onChange={e => setQuery(e.target.value)}
             placeholder="Search color names..."
             className="w-full bg-surface text-text rounded-xl border border-border px-4 py-3 text-sm outline-none focus:border-primary/50 transition-colors placeholder:text-text-tertiary" />
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-text-tertiary">Sort:</span>
+            {['name', 'hue'].map(s => (
+              <button key={s} onClick={() => setSort(s)}
+                className={`px-3 py-1 text-xs rounded-lg ${sort === s ? 'bg-primary text-white' : 'bg-surface text-text-secondary border border-border hover:text-text'} transition-all cursor-pointer`}>{s === 'name' ? 'Name' : 'Hue'}</button>
+            ))}
+          </div>
+          <div className="flex gap-2 items-center">
+            <input type="text" value={closest} onChange={e => setClosest(e.target.value)} placeholder="#rrggbb"
+              className="flex-1 bg-surface text-text rounded-lg border border-border px-3 py-2 text-sm font-mono outline-none focus:border-primary/50" />
+            <button onClick={findClosest} className="px-3 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer">Find Closest</button>
+          </div>
+          {match && (
+            <div className="flex items-center gap-2 bg-surface rounded-lg px-3 py-2 border border-border/50">
+              <div className="w-6 h-6 rounded border border-border" style={{ backgroundColor: match[1] }} />
+              <span className="text-sm text-text font-medium">{match[0]}</span>
+              <span className="text-xs text-text-tertiary font-mono ml-auto">{match[1]}</span>
+            </div>
+          )}
         </div>
       </GlassCard>
       <div className="flex items-center justify-between mt-4 mb-2">
