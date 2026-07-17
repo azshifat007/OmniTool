@@ -63,6 +63,7 @@ export default function DicePage() {
   const [results, setResults] = useState(null);
   const [shaking, setShaking] = useState(false);
   const [history, setHistory] = useState([]);
+  const [target, setTarget] = useState(0);
   const shakeTimeout = useRef(null);
 
   const handleRoll = useCallback(() => {
@@ -125,6 +126,12 @@ export default function DicePage() {
                 className="w-full px-4 py-3 text-sm font-bold rounded-lg bg-primary text-white hover:bg-primary-dark transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                 {shaking ? 'Rolling...' : 'Roll Dice'}
               </button>
+
+              <div>
+                <label className="text-xs text-text-tertiary mb-1 block">Target Total (optional): {target || 'off'}</label>
+                <input type="range" min={0} max={200} step={1} value={target} onChange={(e) => setTarget(parseInt(e.target.value))}
+                  className="w-full accent-primary cursor-pointer" />
+              </div>
             </div>
           </GlassCard>
 
@@ -157,7 +164,10 @@ export default function DicePage() {
         <div className="space-y-5">
           <GlassCard>
             <div className="p-4">
-              <span className="text-xs text-text-tertiary mb-3 block">Result</span>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-text-tertiary">Result</span>
+                {results && <CopyButton text={results.join(', ')} />}
+              </div>
               <AnimatePresence mode="wait">
                 {shaking ? (
                   <motion.div key="shaking" className="flex flex-wrap gap-3 justify-center py-8"
@@ -194,6 +204,24 @@ export default function DicePage() {
                             <div className="text-sm font-mono text-text font-bold">{value}</div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {target > 0 && stats && (
+                      <div className="bg-surface rounded-lg p-3 border border-border/50">
+                        <div className="flex items-center justify-between text-xs text-text-tertiary mb-1">
+                          <span>Progress to {target}</span>
+                          <span className="font-mono text-text">{stats.total} / {target}</span>
+                        </div>
+                        <div className="w-full bg-bg rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${stats.total >= target ? 'bg-cat-success' : 'bg-primary'}`}
+                            style={{ width: `${Math.min(100, (stats.total / target) * 100)}%` }}
+                          />
+                        </div>
+                        {stats.total >= target && (
+                          <div className="text-xs text-cat-success font-medium mt-1">🎯 Target reached!</div>
+                        )}
                       </div>
                     )}
                   </motion.div>

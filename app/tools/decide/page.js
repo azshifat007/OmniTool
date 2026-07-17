@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
+import CopyButton from '@/components/CopyButton';
 import { useHistory } from '@/components/HistoryProvider';
 
 function DiceFace({ value }) {
@@ -260,11 +261,14 @@ export default function DecidePage() {
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-text-tertiary">Recent Decisions ({totalDecisions})</span>
-                {history.length > 0 && (
-                  <button onClick={clearHistory}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:border-primary/40 hover:text-text transition-all cursor-pointer"
-                  >Clear</button>
-                )}
+                <div className="flex items-center gap-2">
+                  {result && <CopyButton text={result} />}
+                  {history.length > 0 && (
+                    <button onClick={clearHistory}
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:border-primary/40 hover:text-text transition-all cursor-pointer"
+                    >Clear</button>
+                  )}
+                </div>
               </div>
               {history.length === 0 ? (
                 <div className="text-xs text-text-tertiary text-center py-6">No decisions yet</div>

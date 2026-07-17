@@ -127,6 +127,7 @@ export default function BpmTapPage() {
   const beats = TIME_SIGNATURES.find(t => t.id === timeSig)?.beats || 4
 
   const historyText = history.map(h => `${h.time} | ${h.bpm} BPM | ${h.taps} taps`).join('\n')
+  const fullText = bpm ? `${bpm} BPM (${bpmInfo?.label || ''}) · ${Math.round(60000 / bpm)} ms/beat · ${consistency}% consistent` : ''
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -158,6 +159,7 @@ export default function BpmTapPage() {
               <div className="space-y-1">
                 <div className="text-6xl font-bold font-heading text-text tabular-nums">{bpm}</div>
                 {bpmInfo && <div className={`text-sm font-medium ${bpmInfo.color}`}>{bpmInfo.label}</div>}
+                <div className="text-xs text-text-tertiary font-mono">{Math.round(60000 / bpm)} ms / beat</div>
               </div>
             ) : (
               <div className="text-lg text-text-secondary">
@@ -172,7 +174,7 @@ export default function BpmTapPage() {
               {taps.length} tap{taps.length !== 1 ? 's' : ''}
               {consistency > 0 && ` · ${consistency}% consistent`}
             </div>
-            <CopyButton text={bpm ? `${bpm} BPM (${bpmInfo?.label || ''})` : ''} />
+            <CopyButton text={fullText} />
             {taps.length > 0 && (
               <button onClick={handleReset} className="text-xs px-3 py-1.5 rounded-lg bg-surface border border-border text-text-secondary hover:text-text cursor-pointer transition-colors">
                 Reset

@@ -24,6 +24,8 @@ export default function ClickSpeedPage() {
   const [history, setHistory] = useState([])
   const [bestCps, setBestCps] = useState(0)
   const [clickTimes, setClickTimes] = useState([])
+  const [positions, setPositions] = useState([])
+  const buttonRef = useRef(null)
   const timerRef = useRef(null)
   const startTimeRef = useRef(null)
 
@@ -46,6 +48,7 @@ export default function ClickSpeedPage() {
     setRunning(true)
     setResult(null)
     setClickTimes([])
+    setPositions([])
     startTimeRef.current = Date.now()
     addEntry('Click Speed Test')
     const end = Date.now() + duration * 1000
@@ -57,10 +60,16 @@ export default function ClickSpeedPage() {
     }, 50)
   }, [duration, addEntry])
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     if (!running) { start(); return }
     setCount(c => c + 1)
     setClickTimes(t => [...t, Date.now() - startTimeRef.current])
+    if (e && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      setPositions(p => [...p, { x, y }])
+    }
   }
 
   useEffect(() => {
@@ -120,8 +129,12 @@ export default function ClickSpeedPage() {
               </div>
             )}
 
-            <button onClick={handleClick} disabled={running && result}
-              className="w-48 h-48 rounded-full text-4xl font-bold bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all shadow-lg cursor-pointer select-none">
+            <button ref={buttonRef} onClick={handleClick} disabled={running && result}
+              className="w-48 h-48 rounded-full text-4xl font-bold bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all shadow-lg cursor-pointer select-none relative overflow-hidden">
+              {positions.map((p, i) => (
+                <span key={i} className="absolute w-2 h-2 rounded-full bg-white/30 pointer-events-none"
+                  style={{ left: `${p.x}%`, top: `${p.y}%`, transform: 'translate(-50%, -50%)' }} />
+              ))}
               {running ? count : result ? 'Again' : 'Start'}
             </button>
 

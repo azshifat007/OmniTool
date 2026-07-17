@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
+import { useHistory } from '@/components/HistoryProvider';
 
 const bases = [
   { id: 'bin', label: 'Binary', base: 2, prefix: '0b' },
@@ -24,10 +26,20 @@ function convertAll(fromBase, fromValue) {
 }
 
 export default function BasePage() {
+  const { addEntry } = useHistory();
   const [active, setActive] = useState('dec');
   const [input, setInput] = useState('42');
   const base = bases.find((b) => b.id === active);
   const results = convertAll(base.base, input || '0');
+
+  const handleActive = useCallback((id) => {
+    setActive(id);
+    if (results) addEntry('Base Converter');
+  }, [results, addEntry]);
+
+  const allText = results
+    ? bases.map((b) => `${b.label}: ${b.prefix}${results[b.id]}`).join('\n')
+    : '';
 
   return (
     <div>
@@ -40,7 +52,7 @@ export default function BasePage() {
         {bases.map((b) => (
           <button
             key={b.id}
-            onClick={() => setActive(b.id)}
+            onClick={() => handleActive(b.id)}
             className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all cursor-pointer ${
               active === b.id
                 ? 'bg-primary text-white border-primary'
@@ -77,6 +89,30 @@ export default function BasePage() {
           </div>
         ))}
       </div>
+
+      {results !== null && (
+        <GlassCard className="mt-6">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-text-tertiary">All Representations</span>
+              <CopyButton text={allText} />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {bases.map((b) => (
+                <div key={b.id} className="bg-bg rounded-lg px-3 py-2 border border-border/50">
+                  <div className="text-xs text-text-tertiary">{b.label}</div>
+                  <div className="text-sm font-mono text-text font-medium break-all">{b.prefix}{results[b.id]}</div>
+                </div>
+              ))}
+            </div>
+            {results.bin !== '' && (
+              <div className="mt-3 text-xs text-text-tertiary">
+                Bit length: <span className="font-mono text-text">{results.bin.length} bits</span>
+              </div>
+            )}
+          </div>
+        </GlassCard>
+      )}
 
       {results === null && input && (
         <p className="text-cat-text text-sm mt-3">Enter a valid {base.label.toLowerCase()} number</p>
