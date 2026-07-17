@@ -71,7 +71,7 @@ export default function CombinationPage() {
             </div>
             <div className="text-center py-2">
               <div className="text-2xl font-bold font-heading text-text">{combination.toLocaleString()}</div>
-              <div className="text-[10px] text-text-tertiary">C({nVal}, {rVal})</div>
+              <div className="text-[10px] text-text-tertiary">C({nVal}, {rVal}) = n! / (r!(n-r)!)</div>
             </div>
             <CopyButton text={String(combination)} className="text-[10px]" />
           </div>
@@ -94,7 +94,7 @@ export default function CombinationPage() {
             </div>
             <div className="text-center py-2">
               <div className="text-2xl font-bold font-heading text-text">{permutation.toLocaleString()}</div>
-              <div className="text-[10px] text-text-tertiary">P({nVal}, {rVal})</div>
+              <div className="text-[10px] text-text-tertiary">P({nVal}, {rVal}) = n! / (n-r)!</div>
             </div>
             <CopyButton text={String(permutation)} className="text-[10px]" />
           </div>

@@ -30,9 +30,24 @@ export default function ContrastPage() {
   const [bg, setBg] = useState('#f0f0f0');
   const [fgRgb, bgRgb] = useMemo(() => [hexToRgb(fg), hexToRgb(bg)], [fg, bg]);
   const [size, setSize] = useState(24);
+  const [largeText, setLargeText] = useState(false);
   const ratio = useMemo(() => {
     try { return contrast(fgRgb, bgRgb); } catch { return 0; }
   }, [fgRgb, bgRgb]);
+
+  const suggest = () => {
+    const target = largeText ? 3 : 4.5;
+    let best = null, bestD = Infinity;
+    for (let b = 0; b <= 255; b += 8) {
+      for (let g = 0; g <= 255; g += 8) {
+        for (let r = 0; r <= 255; r += 8) {
+          const c = contrast(fgRgb, [r, g, b]);
+          if (c >= target && c < bestD) { bestD = c; best = [r, g, b]; }
+        }
+      }
+    }
+    if (best) setBg('#' + best.map((x) => x.toString(16).padStart(2, '0')).join(''));
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -71,6 +86,18 @@ export default function ContrastPage() {
             <label className="text-xs text-text-tertiary mb-1.5 block">Preview font size: {size}px</label>
             <input type="range" min={12} max={48} value={size} onChange={e => setSize(parseInt(e.target.value))} className="w-full accent-primary cursor-pointer" />
           </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs text-text-secondary cursor-pointer">
+              <input type="checkbox" checked={largeText} onChange={() => setLargeText(v => !v)} className="w-4 h-4 rounded border-border accent-primary" />
+              Large text mode (≥18px / 14px bold)
+            </label>
+            <button onClick={() => navigator.clipboard.writeText(ratio.toFixed(2) + ':1')}
+              className="ml-auto text-[10px] text-text-secondary hover:text-primary cursor-pointer">Copy ratio</button>
+          </div>
+          <button onClick={suggest}
+            className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">
+            Suggest accessible background ({largeText ? '≥3' : '≥4.5'}:1)
+          </button>
           <div className="grid grid-cols-2 gap-4 text-sm">
             {[
               { label: 'AA Normal', pass: ratio >= 4.5 },

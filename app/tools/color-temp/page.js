@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/GlassCard';
 import CopyButton from '@/components/CopyButton';
@@ -15,6 +15,18 @@ function kelvinToRGB(k) {
   r = clamp(r); g = clamp(g); b = clamp(b);
   const hex = '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
   return { r, g, b, hex };
+}
+
+function rgbToKelvin(r, g, b) {
+  const clamp = (v) => Math.max(0, Math.min(255, v));
+  r = clamp(r); g = clamp(g); b = clamp(b);
+  const eps = 0.0001;
+  const rEff = r / 255, gEff = g / 255, bEff = b / 255;
+  const X = (-0.14282 * rEff + 1.54924 * gEff - 0.95641 * bEff) / (0.41847 * rEff - 0.85266 * gEff + 1.52432 * bEff + eps);
+  const Y = (0.63612 * rEff + 1.37369 * gEff + 0.06939 * bEff) / (0.41847 * rEff - 0.85266 * gEff + 1.52432 * bEff + eps);
+  const n = (X / (Y + eps) - 0.332) / (0.1858 - (X / (Y + eps)) / 1.2915);
+  const cct = 449 * Math.pow(n, 3) + 3525 * Math.pow(n, 2) + 6823.3 * n + 5520.33;
+  return Math.round(Math.max(1000, Math.min(40000, cct)));
 }
 
 const presets = [
@@ -33,7 +45,24 @@ const presets = [
 export default function ColorTempPage() {
   const { addEntry } = useHistory();
   const [kelvin, setKelvin] = useState(5500);
+  const [swatches, setSwatches] = useState([]);
+  const [reverse, setReverse] = useState({ r: 255, g: 255, b: 255 });
+  const [reverseHex, setReverseHex] = useState('#ffffff');
   const rgb = kelvinToRGB(kelvin);
+
+  const saveSwatch = useCallback(() => {
+    setSwatches((prev) => [rgb.hex, ...prev.filter((s) => s !== rgb.hex)].slice(0, 12));
+    addEntry('Color Temperature');
+  }, [rgb, addEntry]);
+
+  const applyReverse = useCallback((hex) => {
+    setReverseHex(hex);
+    if (/^#[0-9a-f]{6}$/i.test(hex)) {
+      const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      setReverse({ r, g, b });
+      setKelvin(rgbToKelvin(r, g, b));
+    }
+  }, []);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -106,9 +135,31 @@ export default function ColorTempPage() {
               <pre className="bg-surface rounded-lg p-3 text-xs font-mono text-text border border-border whitespace-pre-wrap">{`color: ${rgb.hex};
 background-color: ${rgb.hex};`}</pre>
             </div>
+
+            <button onClick={saveSwatch} className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">Save to Palette</button>
+            {swatches.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {swatches.map((s, i) => (
+                  <button key={i} onClick={() => setKelvin(rgbToKelvin(parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)))}
+                    className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: s }} title={s} />
+                ))}
+              </div>
+            )}
           </div>
         </GlassCard>
       </div>
+
+      <GlassCard className="mt-5">
+        <div className="p-4 space-y-3">
+          <span className="text-xs text-text-tertiary block">Reverse: RGB / Hex → Kelvin</span>
+          <div className="flex items-center gap-3">
+            <input type="color" value={reverseHex} onChange={(e) => applyReverse(e.target.value)} className="w-10 h-10 rounded-lg border border-border cursor-pointer" />
+            <input type="text" value={reverseHex} onChange={(e) => applyReverse(e.target.value)}
+              className="w-28 bg-surface text-text rounded-lg border border-border px-3 py-2 text-sm font-mono outline-none focus:border-primary/50" />
+            <span className="text-sm text-text-tertiary">≈ <span className="text-text font-mono font-semibold">{rgbToKelvin(reverse.r, reverse.g, reverse.b)}K</span></span>
+          </div>
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }

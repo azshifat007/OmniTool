@@ -43,6 +43,24 @@ export default function CookieEditorPage() {
     load();
   }, [load, addEntry]);
 
+  const exportJson = useCallback(() => {
+    const json = JSON.stringify(cookies, null, 2);
+    navigator.clipboard.writeText(json);
+    setMessage('All cookies copied as JSON.');
+  }, [cookies]);
+
+  const updateCookie = useCallback((n, val) => {
+    setCookies((prev) => prev.map((c) => c.name === n ? { ...c, value: val } : c));
+  }, []);
+
+  const saveCookie = useCallback((n) => {
+    const c = cookies.find((x) => x.name === n);
+    if (!c) return;
+    document.cookie = `${n}=${c.value}; path=${path || '/'}`;
+    setMessage(`Cookie "${n}" updated.`);
+    load();
+  }, [cookies, path, load]);
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center gap-3 mb-6">
@@ -92,12 +110,17 @@ export default function CookieEditorPage() {
                   <div key={i} className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-surface border border-border/50">
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-medium text-text truncate">{c.name}</div>
-                      <div className="text-[10px] text-text-tertiary truncate">{c.value}</div>
+                      <input value={c.value} onChange={(e) => updateCookie(c.name, e.target.value)}
+                        className="w-full bg-surface rounded px-1.5 py-1 text-[10px] font-mono text-text border border-border/50 focus:border-primary focus:outline-none" />
                     </div>
+                    <button onClick={() => saveCookie(c.name)} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-all cursor-pointer">Save</button>
                     <button onClick={() => deleteCookie(c.name)} className="text-cat-text text-[10px] px-1.5 py-0.5 rounded hover:bg-cat-text/10 transition-all cursor-pointer">✕</button>
                   </div>
                 ))}
               </div>
+            )}
+            {cookies.length > 0 && (
+              <button onClick={exportJson} className="mt-2 w-full px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-secondary border border-border hover:text-text transition-all cursor-pointer">Copy All as JSON</button>
             )}
             {message && <div className="text-xs text-text-tertiary mt-2">{message}</div>}
           </div>

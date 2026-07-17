@@ -255,7 +255,15 @@ export default function ColorPickerPage() {
           {history.length > 0 && (
             <GlassCard>
               <div className="p-4">
-                <span className="text-xs text-text-tertiary mb-3 block">History (last 10)</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs text-text-tertiary">History (last 10)</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => navigator.clipboard.writeText(history.map((c) => c.hex).join(', '))}
+                      className="text-[10px] text-text-secondary hover:text-primary cursor-pointer">Copy</button>
+                    <button onClick={() => setHistory([])}
+                      className="text-[10px] text-cat-text hover:text-cat-text/80 cursor-pointer">Clear</button>
+                  </div>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {history.map((c, i) => (
                     <div key={i} className="flex flex-col items-center gap-1">
