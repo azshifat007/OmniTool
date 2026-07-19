@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <div>
       <Hero className="mb-10 !min-h-0 !pb-0 bg-transparent relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(124,58,237,0.07)_1px,transparent_0)] dark:bg-[radial-gradient(circle_at_1px_1px,rgba(139,92,246,0.05)_1px,transparent_0)] bg-[length:24px_24px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(124,58,237,0.07)_1px,transparent_0)] bg-[length:24px_24px] pointer-events-none" />
         <AnimatedContainer transformDirection="bottom">
           <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />

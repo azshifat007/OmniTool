@@ -37,24 +37,6 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-.dark {
-  --color-bg: #0C0A1D;
-  --color-surface: #161332;
-  --color-text: #F0EDFF;
-  --color-text-secondary: #A5A0C8;
-  --color-text-tertiary: #6B6590;
-  --color-primary: #8B5CF6;
-  --color-primary-light: #A78BFA;
-  --color-primary-dark: #7C3AED;
-  --color-accent: #FB923C;
-  --color-accent-light: #FDBA74;
-  --color-border: #2A2550;
-  --color-border-light: #1E1A3E;
-  --color-badge-bg: #1E1A3E;
-  --color-shadow-nav: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --color-shadow-nav-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
 
 body {
   background: var(--color-bg);
@@ -139,10 +121,6 @@ body {
   border-color: var(--color-primary);
 }
 
-.dark .card-hover:hover {
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.2);
-}
-
 
 .nav-blur {
   backdrop-filter: blur(12px);
@@ -179,11 +157,6 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(108, 92, 231, 0.08),
               0 2px 8px rgba(108, 92, 231, 0.04);
-}
-
-.dark .glass-card:hover {
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15),
-              0 2px 8px rgba(139, 92, 246, 0.08);
 }
 
 

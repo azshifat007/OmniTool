@@ -1,9 +1,6 @@
 'use client'
 
-import { useTheme } from './ThemeProvider'
-
 export default function GlowingShadow({ children }) {
-  const { dark } = useTheme()
 
   return (
     <>
@@ -268,7 +265,7 @@ export default function GlowingShadow({ children }) {
         }
       `}</style>
 
-      <div className={`glow-container ${dark ? '' : 'light'}`}>
+      <div className="glow-container light">
         <span className="glow"></span>
         <div className="glow-content">
           {children}

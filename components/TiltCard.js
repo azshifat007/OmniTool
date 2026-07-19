@@ -42,7 +42,7 @@ function CardPattern({ mouseX, mouseY, str }) {
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-500"
         style={{ mask, WebkitMaskImage: mask }}
       >
-        <p className="absolute inset-x-0 top-0 text-[10px] leading-none break-words whitespace-pre-wrap text-white/20 dark:text-white/10 font-mono font-bold py-2 px-3 select-none">
+        <p className="absolute inset-x-0 top-0 text-[10px] leading-none break-words whitespace-pre-wrap text-white/20 font-mono font-bold py-2 px-3 select-none">
           {str}
         </p>
       </motion.div>
@@ -74,7 +74,7 @@ export default function TiltCard({ href, cat, icon, title, children }) {
       >
         <CardPattern mouseX={mx} mouseY={my} str={str} />
         <div className="relative z-10 flex flex-col items-center gap-2.5 w-full">
-          <div className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-bg dark:bg-white/5 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/10">
+          <div className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-bg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/10">
             <span className="relative z-10 text-2xl sm:text-3xl leading-none">{icon}</span>
           </div>
           <h3 className="font-heading text-sm sm:text-base font-semibold text-text group-hover:text-primary transition-colors duration-300">
