@@ -174,7 +174,7 @@ export function TextStagger({
 }) {
   const words = text.split(" ")
 
-  const MotionComp = motion(Component)
+  const MotionComp = React.useMemo(() => motion(Component), [Component])
   return (
     <MotionComp
       transition={{ staggerChildren: stagger }}
