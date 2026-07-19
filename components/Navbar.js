@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@/components/ThemeProvider';
 import tools from '@/lib/tools';
 
 export default function Navbar() {
@@ -14,6 +15,7 @@ export default function Navbar() {
   const [focused, setFocused] = useState(false);
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
+  const { dark, toggle } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -64,7 +66,7 @@ export default function Navbar() {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`rounded-2xl px-5 py-3 flex items-center justify-between gap-3 transition-all duration-300 ${
+          className={`rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 transition-all duration-300 ${
             scrolled
               ? 'bg-surface/85 nav-blur shadow-[var(--color-shadow-nav)]'
               : 'bg-surface shadow-[var(--color-shadow-nav-sm)]'
@@ -83,7 +85,7 @@ export default function Navbar() {
                 </svg>
               </button>
             )}
-            <Link href="/" className="flex items-center gap-3 no-underline group">
+            <Link href="/" className="flex items-center gap-2.5 no-underline group">
               <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all">
                 O
               </span>
@@ -93,7 +95,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-            <div ref={wrapperRef} className="relative flex-1 max-w-md">
+          <div ref={wrapperRef} className="relative flex-1 max-w-md">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -108,7 +110,7 @@ export default function Navbar() {
                 placeholder="Search tools..."
                 className="w-full bg-bg rounded-xl pl-9 pr-10 py-2 text-sm text-text border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-text-tertiary"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-bg border border-border text-text-tertiary pointer-events-none">⌘K</kbd>
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-bg border border-border text-text-tertiary pointer-events-none hidden sm:block">⌘K</kbd>
             </div>
 
             <AnimatePresence>
@@ -148,10 +150,33 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              onClick={toggle}
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all cursor-pointer"
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {dark ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
             <Link
               href="/history"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-bg border border-border text-sm font-medium text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all no-underline"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-bg border border-border text-sm font-medium text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all no-underline"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
