@@ -179,8 +179,7 @@ export function TextStagger({
     <MotionComp
       transition={{ staggerChildren: stagger }}
       initial="hidden"
-      whileInView={"visible"}
-      viewport={{ once: true }}
+      animate="visible"
       className={cn("relative", className)}
       {...props}
     >
@@ -203,8 +202,7 @@ export const AnimatedContainer = React.forwardRef(
         ref={ref}
         variants={transformVariants(transformDirection)}
         initial="hidden"
-        whileInView={"visible"}
-        viewport={{ once: true, ...props.viewport }}
+        animate="visible"
         transition={{
           duration: props.transition?.delay ?? 0.4,
           ease: props.transition?.delay ?? "easeIn",
