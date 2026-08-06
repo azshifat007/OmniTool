@@ -98,9 +98,29 @@ export default function MdToPdfPage() {
   const [pageSize, setPageSize] = useState('a4');
   const [font, setFont] = useState('serif');
   const [theme, setTheme] = useState('light');
+  const [fileName, setFileName] = useState('');
+  const [error, setError] = useState('');
   const html = useMemo(() => mdToHtml(input), [input]);
 
   const pageDims = pageSize === 'a4' ? '21cm 29.7cm' : '21.6cm 27.9cm';
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.md') && file.type !== 'text/markdown' && file.type !== 'text/x-markdown') {
+      setError('Please upload a .md markdown file.');
+      return;
+    }
+    setError('');
+    addEntry('Markdown to PDF');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setInput(String(reader.result || ''));
+      setFileName(file.name);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   const downloadPdf = () => {
     addEntry('Markdown to PDF');
@@ -163,6 +183,17 @@ export default function MdToPdfPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div className="bg-surface rounded-2xl border border-border p-4">
               <label className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2 block">Markdown</label>
+              <div className="flex items-center gap-2 mb-2">
+                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bg border border-border text-text-secondary text-xs font-medium hover:border-primary hover:text-text transition-all cursor-pointer">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Upload .md
+                  <input type="file" accept=".md,.markdown,text/markdown,text/x-markdown" onChange={handleFile} className="hidden" />
+                </label>
+                {fileName && <span className="text-xs text-text-tertiary truncate">📄 {fileName}</span>}
+              </div>
+              {error && <div className="text-xs text-cat-text bg-cat-text/10 rounded-lg px-3 py-2 mb-2 border border-cat-text/20">{error}</div>}
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

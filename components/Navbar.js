@@ -5,9 +5,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import tools from '@/lib/tools';
+import { useTheme } from '@/components/ThemeProvider';
+
+function BrandMark({ className = '' }) {
+  return (
+    <span className={`grid grid-cols-3 gap-[2.5px] p-[6px] rounded-xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all ${className}`}>
+      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
+      <span className="w-[5px] h-[5px] rounded-full bg-accent-light" />
+      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
+      <span className="w-[5px] h-[5px] rounded-full bg-white/60" />
+      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
+      <span className="w-[5px] h-[5px] rounded-full bg-accent" />
+      <span className="w-[5px] h-[5px] rounded-full bg-accent-light/70" />
+      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
+      <span className="w-[5px] h-[5px] rounded-full bg-white/70" />
+    </span>
+  );
+}
 
 export default function Navbar() {
+  const { dark, toggle } = useTheme();
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const isToolPage = pathname !== '/';
   const [query, setQuery] = useState('');
@@ -16,6 +35,7 @@ export default function Navbar() {
   const wrapperRef = useRef(null);
 
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -84,10 +104,8 @@ export default function Navbar() {
               </button>
             )}
             <Link href="/" className="flex items-center gap-2.5 no-underline group">
-              <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all">
-                O
-              </span>
-              <span className="font-heading text-lg font-semibold text-text hidden sm:inline group-hover:text-primary transition-colors">
+              <BrandMark />
+              <span className="font-heading text-lg font-bold text-text hidden sm:inline group-hover:text-primary transition-colors tracking-tight">
                 OmniTool
               </span>
             </Link>
@@ -106,9 +124,9 @@ export default function Navbar() {
                 onFocus={() => setFocused(true)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search tools..."
-                className="w-full bg-bg rounded-xl pl-9 pr-10 py-2 text-sm text-text border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-text-tertiary"
+                className="w-full bg-bg rounded-xl pl-9 pr-14 py-2 text-sm text-text border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-text-tertiary"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-bg border border-border text-text-tertiary pointer-events-none hidden sm:block">⌘K</kbd>
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-surface border border-border text-text-tertiary pointer-events-none hidden sm:block">⌘K</kbd>
             </div>
 
             <AnimatePresence>
@@ -149,6 +167,21 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              onClick={toggle}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-bg border border-border text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all cursor-pointer"
+            >
+              {mounted && dark ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
             <Link
               href="/history"
               className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-bg border border-border text-sm font-medium text-text-secondary hover:text-text hover:border-primary/50 hover:bg-primary/10 transition-all no-underline"

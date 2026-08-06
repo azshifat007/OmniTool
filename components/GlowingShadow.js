@@ -88,8 +88,8 @@ export default function GlowingShadow({ children }) {
         }
 
         .light {
-          --bg-gradient-base: hsl(0deg 0% 88%);
-          --glow-lightness: 68%;
+          --bg-gradient-base: hsl(43deg 22% 90%);
+          --glow-lightness: 58%;
           --shadow-color: rgb(0 0 0 / 6%);
         }
 
@@ -257,10 +257,13 @@ export default function GlowingShadow({ children }) {
 
         @keyframes hue-animation {
           0% {
-            --hue: 0;
+            --hue: 160;
+          }
+          50% {
+            --hue: 24;
           }
           100% {
-            --hue: 360;
+            --hue: 160;
           }
         }
       `}</style>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const ThemeContext = createContext({ dark: false, toggle: () => {} });
 
@@ -10,27 +10,23 @@ export function useTheme() {
 
 export default function ThemeProvider({ children }) {
   const [dark, setDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('omnitool-dark');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const isDark = stored !== null ? stored === 'true' : prefersDark;
     setDark(isDark);
-    setMounted(true);
+    document.documentElement.classList.toggle('dark', isDark);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('omnitool-dark', dark);
-  }, [dark, mounted]);
-
-  const toggle = () => setDark((d) => !d);
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  const toggle = useCallback(() => {
+    setDark((d) => {
+      const next = !d;
+      document.documentElement.classList.toggle('dark', next);
+      localStorage.setItem('omnitool-dark', String(next));
+      return next;
+    });
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ dark, toggle }}>
