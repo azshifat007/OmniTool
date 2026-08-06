@@ -26,6 +26,19 @@ const monoFont = JetBrains_Mono({
 export const metadata = {
   title: "OmniTool — Everything you need, nothing you don't",
   description: "A playful toolkit for developers, creators, and tinkerers",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    title: "OmniTool",
+    statusBarStyle: "default",
+  },
 };
 
 const popular = [
@@ -64,7 +77,11 @@ export default function RootLayout({ children }) {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
                 <div className="col-span-2 sm:col-span-3 lg:col-span-2">
                   <div className="flex items-center gap-2.5 mb-3">
-                    <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-[11px] font-bold">O</span>
+                    <img
+                      src="/android-chrome-192x192.png"
+                      alt="OmniTool logo"
+                      className="w-7 h-7 rounded-lg object-cover"
+                    />
                     <span className="font-heading text-base font-bold text-text">OmniTool</span>
                   </div>
                   <p className="text-sm text-text-secondary leading-relaxed max-w-xs mb-4">

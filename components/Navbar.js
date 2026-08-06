@@ -1,24 +1,73 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import tools from '@/lib/tools';
 import { useTheme } from '@/components/ThemeProvider';
 
+const POPULAR = [
+  '/tools/md-to-pdf', '/tools/pdf-to-txt', '/tools/csv-to-json', '/tools/yaml',
+  '/tools/case', '/tools/qr', '/tools/video-converter', '/tools/background-remover',
+];
+
+const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const STOPWORDS = new Set(['to', 'from', 'and', 'the', 'for', 'of', 'or', 'a', 'an', 'vs', 'with', 'in']);
+
+function isSubsequence(q, s) {
+  let i = 0;
+  for (let j = 0; j < s.length && i < q.length; j++) {
+    if (q[i] === s[j]) i++;
+  }
+  return i === q.length;
+}
+
+function scoreTool(t, q, qWords) {
+  const title = normalize(t.title);
+  const desc = normalize(t.desc);
+  const cat = normalize(t.cat);
+  const titleWords = title.split(' ').filter(Boolean);
+  let score = 0;
+  if (title === q) score += 120;
+  else if (title.startsWith(q)) score += 100;
+  else if (title.includes(q)) score += 70;
+  if (desc.includes(q) && q.length >= 3) score += 25;
+  if (cat === q) score += 30;
+  for (const w of qWords) {
+    if (titleWords.some((tw) => tw.startsWith(w) || (w.length >= 2 && isSubsequence(w, tw)))) score += 20;
+    if (title.includes(w)) score += 12;
+    if (desc.includes(w)) score += 6;
+    if (cat.includes(w)) score += 8;
+  }
+  if (score === 0 && isSubsequence(q, title.replace(/ /g, ''))) score += 20;
+  return score;
+}
+
+function tokens(q) {
+  return q.split(' ').filter((w) => w && !STOPWORDS.has(w));
+}
+
+function relatedTools(query) {
+  const q = normalize(query);
+  const qWords = tokens(q);
+  const catScores = {};
+  for (const t of tools) {
+    for (const w of qWords) {
+      if (t.cat.toLowerCase().includes(w) || t.title.toLowerCase().includes(w)) {
+        catScores[t.cat] = (catScores[t.cat] || 0) + 1;
+      }
+    }
+  }
+  const bestCat = Object.entries(catScores).sort((a, b) => b[1] - a[1])[0]?.[0];
+  if (bestCat) return tools.filter((t) => t.cat === bestCat).slice(0, 6);
+  return POPULAR.map((href) => tools.find((t) => t.href === href)).filter(Boolean);
+}
+
 function BrandMark({ className = '' }) {
   return (
-    <span className={`grid grid-cols-3 gap-[2.5px] p-[6px] rounded-xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all ${className}`}>
-      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
-      <span className="w-[5px] h-[5px] rounded-full bg-accent-light" />
-      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
-      <span className="w-[5px] h-[5px] rounded-full bg-white/60" />
-      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
-      <span className="w-[5px] h-[5px] rounded-full bg-accent" />
-      <span className="w-[5px] h-[5px] rounded-full bg-accent-light/70" />
-      <span className="w-[5px] h-[5px] rounded-full bg-white/90" />
-      <span className="w-[5px] h-[5px] rounded-full bg-white/70" />
+    <span className={`relative block w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105 transition-all ${className}`}>
+      <img src="/android-chrome-192x192.png" alt="OmniTool logo" className="w-full h-full object-cover" />
     </span>
   );
 }
@@ -31,6 +80,7 @@ export default function Navbar() {
   const isToolPage = pathname !== '/';
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [selected, setSelected] = useState(0);
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
 
@@ -62,21 +112,61 @@ export default function Navbar() {
     };
   }, []);
 
-  const results = query.trim()
-    ? tools.filter(
-        (t) =>
-          t.title.toLowerCase().includes(query.toLowerCase()) ||
-          t.desc.toLowerCase().includes(query.toLowerCase()) ||
-          t.cat.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 20)
-    : [];
+  const trimmed = query.trim();
+  const matched = useMemo(() => {
+    if (!trimmed) return [];
+    const q = normalize(trimmed);
+    const qWords = tokens(q);
+    if (!q) return [];
+    return tools
+      .map((t) => ({ t, s: scoreTool(t, q, qWords) }))
+      .filter((r) => r.s > 0)
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 20)
+      .map((r) => r.t);
+  }, [trimmed]);
+
+  const fallback = useMemo(() => (trimmed && matched.length === 0 ? relatedTools(trimmed).slice(0, 6) : []), [trimmed, matched]);
+
+  const activeItems = matched.length > 0 ? matched : fallback;
+  const showEmptySuggest = focused && !trimmed;
+
+  const goTo = useCallback((href) => {
+    setFocused(false);
+    setQuery('');
+    setSelected(0);
+    if (window.location.pathname !== href.split('?')[0]) {
+      window.location.href = href;
+    }
+  }, []);
+
+  const closeResults = useCallback(() => {
+    setFocused(false);
+    setQuery('');
+    setSelected(0);
+  }, []);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
       setFocused(false);
+      setSelected(0);
       inputRef.current?.blur();
     }
-  }, []);
+    if (activeItems.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelected((s) => (s + 1) % activeItems.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelected((s) => (s - 1 + activeItems.length) % activeItems.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const item = activeItems[selected];
+      if (item) goTo(item.href);
+    }
+  }, [activeItems, selected, goTo]);
+
+  useEffect(() => { setSelected(0); }, [query]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-5 pt-4">
@@ -130,7 +220,7 @@ export default function Navbar() {
             </div>
 
             <AnimatePresence>
-              {focused && query.trim() && (
+              {(focused && (query.trim() || showEmptySuggest)) && (
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -138,28 +228,91 @@ export default function Navbar() {
                   transition={{ duration: 0.15 }}
                   className="absolute top-full left-0 right-0 mt-1.5 bg-surface border border-border rounded-xl shadow-xl overflow-hidden max-h-72 overflow-y-auto z-50"
                 >
-                  {results.length === 0 ? (
-                    <div className="px-4 py-3 text-sm text-text-tertiary">No tools found</div>
-                  ) : (
-                    results.map((tool) => (
-                      <Link
-                        key={tool.href}
-                        href={tool.href}
-                        onClick={() => { setFocused(false); setQuery(''); }}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-bg transition-colors no-underline group"
-                      >
-                        <span className="text-lg shrink-0 w-6 text-center text-text-secondary group-hover:text-primary transition-colors">
-                          {tool.icon}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm font-medium text-text truncate group-hover:text-primary transition-colors">{tool.title}</div>
-                          <div className="text-xs text-text-tertiary truncate">{tool.desc}</div>
-                        </div>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
-                          {tool.cat}
-                        </span>
-                      </Link>
-                    ))
+                  {showEmptySuggest && (
+                    <>
+                      <div className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border/60">
+                        Popular tools
+                      </div>
+                      {POPULAR.map((href) => {
+                        const tool = tools.find((t) => t.href === href);
+                        if (!tool) return null;
+                        return (
+                          <Link
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={closeResults}
+                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-bg transition-colors no-underline group"
+                          >
+                            <span className="text-lg shrink-0 w-6 text-center text-text-secondary group-hover:text-primary transition-colors">
+                              {tool.icon}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-sm font-medium text-text truncate group-hover:text-primary transition-colors">{tool.title}</div>
+                              <div className="text-xs text-text-tertiary truncate">{tool.desc}</div>
+                            </div>
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
+                              {tool.cat}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {!showEmptySuggest && matched.length === 0 && (
+                    <>
+                      <div className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border/60">
+                        No exact matches for “{query.trim()}” — related tools
+                      </div>
+                      {fallback.map((tool, i) => (
+                        <Link
+                          key={tool.href}
+                          href={tool.href}
+                          onClick={() => goTo(tool.href)}
+                          onMouseEnter={() => setSelected(i)}
+                          className={`flex items-center gap-3 px-4 py-2.5 transition-colors no-underline group ${selected === i ? 'bg-bg' : 'hover:bg-bg'}`}
+                        >
+                          <span className="text-lg shrink-0 w-6 text-center text-text-secondary group-hover:text-primary transition-colors">
+                            {tool.icon}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium text-text truncate group-hover:text-primary transition-colors">{tool.title}</div>
+                            <div className="text-xs text-text-tertiary truncate">{tool.desc}</div>
+                          </div>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
+                            {tool.cat}
+                          </span>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {!showEmptySuggest && matched.length > 0 && (
+                    <>
+                      <div className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary border-b border-border/60">
+                        {matched.length} result{matched.length === 1 ? '' : 's'}
+                      </div>
+                      {matched.map((tool, i) => (
+                        <Link
+                          key={tool.href}
+                          href={tool.href}
+                          onClick={() => goTo(tool.href)}
+                          onMouseEnter={() => setSelected(i)}
+                          className={`flex items-center gap-3 px-4 py-2.5 transition-colors no-underline group ${selected === i ? 'bg-bg' : 'hover:bg-bg'}`}
+                        >
+                          <span className="text-lg shrink-0 w-6 text-center text-text-secondary group-hover:text-primary transition-colors">
+                            {tool.icon}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium text-text truncate group-hover:text-primary transition-colors">{tool.title}</div>
+                            <div className="text-xs text-text-tertiary truncate">{tool.desc}</div>
+                          </div>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
+                            {tool.cat}
+                          </span>
+                        </Link>
+                      ))}
+                    </>
                   )}
                 </motion.div>
               )}
